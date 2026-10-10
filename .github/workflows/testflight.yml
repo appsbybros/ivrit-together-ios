@@ -1,0 +1,209 @@
+name: TestFlight upload
+
+# Started by hand only. Signs with Apple's cloud-managed distribution certificate through an
+# App Store Connect API key (a Team key with the Admin role). Repository secrets:
+# ASC_KEY_ID, ASC_ISSUER_ID, ASC_PRIVATE_KEY (the full .p8 text) and APPLE_TEAM_ID.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ivrit-together-testflight
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    # Checks the API key, its signing access, the App ID and the app record on Linux, so a
+    # setup problem stops the run before any macOS minutes are used. Registers the App ID
+    # com.appsbybros.ivrittogether when it is missing.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      build_number: ${{ steps.setup.outputs.build_number }}
+      app_id: ${{ steps.setup.outputs.app_id }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check App Store Connect setup
+        id: setup
+        shell: bash
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          for name in ASC_KEY_ID ASC_ISSUER_ID ASC_PRIVATE_KEY APPLE_TEAM_ID; do
+            if [ -z "$(printf '%s' "${!name}" | tr -d '[:space:]')" ]; then
+              echo "::error::Missing repository secret: $name"
+              exit 1
+            fi
+          done
+          export ASC_KEY_ID="$(printf '%s' "$ASC_KEY_ID" | tr -d '[:space:]')"
+          export ASC_ISSUER_ID="$(printf '%s' "$ASC_ISSUER_ID" | tr -d '[:space:]')"
+          export APPLE_TEAM_ID="$(printf '%s' "$APPLE_TEAM_ID" | tr -d '[:space:]')"
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          "$RUNNER_TEMP/asc-venv/bin/pip" install --quiet "pyjwt[crypto]"
+          PYTHON="$RUNNER_TEMP/asc-venv/bin/python"
+          "$PYTHON" Scripts/appstore.py check --register
+          app_id="$("$PYTHON" Scripts/appstore.py app-id | tail -1)"
+          # Each run gets a higher build number than every earlier upload, also when this
+          # repository's run count starts again (a new copy of the code).
+          floor=$((1000 + GITHUB_RUN_NUMBER * 10 + GITHUB_RUN_ATTEMPT))
+          next="$("$PYTHON" Scripts/appstore.py next-build | tail -1)"
+          build=$(( next > floor ? next : floor ))
+          echo "Build number: $build"
+          echo "App Store Connect Apple ID: ${app_id:-unknown}"
+          echo "build_number=$build" >> "$GITHUB_OUTPUT"
+          echo "app_id=$app_id" >> "$GITHUB_OUTPUT"
+
+  upload:
+    needs: preflight
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Write App Store Connect API key
+        shell: bash
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          key_id="$(printf '%s' "$ASC_KEY_ID" | tr -d '[:space:]')"
+          key_directory="$RUNNER_TEMP/app-store-connect"
+          mkdir -p "$key_directory"
+          key_path="$key_directory/AuthKey_$key_id.p8"
+          printf '%s\n' "$ASC_PRIVATE_KEY" > "$key_path"
+          chmod 600 "$key_path"
+          {
+            echo "ASC_KEY_PATH=$key_path"
+            echo "ASC_KEY_ID=$key_id"
+            echo "ASC_ISSUER_ID=$(printf '%s' "$ASC_ISSUER_ID" | tr -d '[:space:]')"
+            echo "APPLE_TEAM_ID=$(printf '%s' "$APPLE_TEAM_ID" | tr -d '[:space:]')"
+          } >> "$GITHUB_ENV"
+
+      - name: Prepare upload tool
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/asc-venv"
+          "$RUNNER_TEMP/asc-venv/bin/pip" install --quiet "pyjwt[crypto]"
+          echo "ASC_PYTHON=$RUNNER_TEMP/asc-venv/bin/python" >> "$GITHUB_ENV"
+
+      - name: Generate project
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          if ! command -v xcodegen >/dev/null 2>&1; then
+            brew install xcodegen
+          fi
+          xcodegen generate
+
+      - name: Archive, sign and upload
+        shell: bash
+        env:
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+          BUILD_NUMBER: ${{ needs.preflight.outputs.build_number }}
+          APP_STORE_ID: ${{ needs.preflight.outputs.app_id }}
+        run: |
+          set -uo pipefail
+          mkdir -p build/logs build/archives build/export
+          echo "Build number: $BUILD_NUMBER"
+          ARCHIVE=build/archives/IvritTogether.xcarchive
+
+          cat > build/ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>export</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>uploadSymbols</key><true/>
+            <key>manageAppVersionAndBuildNumber</key><false/>
+          </dict>
+          </plist>
+          PLIST
+
+          # Archive unsigned: a fresh runner has no Apple Development certificate or profile.
+          # Export below signs for distribution with Apple's cloud-managed certificate through
+          # the App Store Connect API key. IVRIT_APP_STORE_ID lets Rate and Share link to the
+          # app's App Store page.
+          if ! xcodebuild archive \
+            -project IvritTogether.xcodeproj \
+            -scheme IvritTogether \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$ARCHIVE" \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            IVRIT_APP_STORE_ID="$APP_STORE_ID" \
+            > build/logs/archive.log 2>&1; then
+            echo "::error::Archive failed"
+            grep -E "error:|ARCHIVE FAILED" build/logs/archive.log | sort -u | head -40 || true
+            exit 1
+          fi
+
+          # Export signs the .ipa for the App Store with the API key. Xcode's own upload needs
+          # an Xcode account, so the API upload below sends it.
+          if ! xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE" \
+            -exportOptionsPlist build/ExportOptions.plist \
+            -exportPath build/export \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            > build/logs/export.log 2>&1; then
+            echo "::error::Signing (export) failed"
+            grep -E "error|Error|EXPORT FAILED" build/logs/export.log | sort -u | head -40 || true
+            echo "--- last export log lines ---"
+            tail -25 build/logs/export.log || true
+            distribution_logs="$(grep -oE "/[^' ]+\.xcdistributionlogs" build/logs/export.log | head -1 || true)"
+            if [ -n "$distribution_logs" ] && [ -d "$distribution_logs" ]; then
+              cp -R "$distribution_logs" build/logs/distribution-logs || true
+            fi
+            exit 1
+          fi
+
+          IPA="$(find build/export -maxdepth 1 -name '*.ipa' | head -1)"
+          if [ -z "$IPA" ]; then
+            echo "::error::Export produced no .ipa"
+            exit 1
+          fi
+          if ! "$ASC_PYTHON" Scripts/appstore.py upload "$IPA" > build/logs/upload.log 2>&1; then
+            echo "::error::Upload failed"
+            cat build/logs/upload.log
+            exit 1
+          fi
+          cat build/logs/upload.log
+          echo "Uploaded Ivrit Together build $BUILD_NUMBER. TestFlight shows it after Apple's processing." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload archive and upload logs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestFlight-logs
+          path: build/logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Remove API key
+        if: ${{ always() }}
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/app-store-connect"

@@ -1,0 +1,31 @@
+{
+  "bundle_id": "com.appsbybros.ivrittogether",
+  "sku_suggestion": "ivrit-together-ios",
+  "version": "1.0.0",
+  "primary_language": "English (U.S.)",
+  "localizations": ["en-US", "he"],
+  "primary_category": "Education",
+  "secondary_category": "Reference",
+  "copyright": "2026 Apps by Bros",
+  "support_email": "appsbybros.dev@gmail.com",
+  "privacy_policy": "docs/privacy.html (English) and docs/privacy-he.html (Hebrew); publish both on a public HTTPS site and enter the URL in App Store Connect",
+  "privacy_answers": {
+    "tracking": false,
+    "data_collected_by_app": false,
+    "third_party_ads": false,
+    "note": "Data Not Collected: learning progress and preferences stay on the device (UserDefaults). Speech uses Apple's on-device voices. Confirm again if SDKs or network features are added."
+  },
+  "age_rating_note": "Answer the questionnaire as an educational app with no objectionable content, no web access, no user-generated content and no purchases.",
+  "pricing": "Free, no in-app purchases or subscriptions (as on Android).",
+  "encryption": "ITSAppUsesNonExemptEncryption is false: the app has no network code of its own.",
+  "review_notes": "No login. Every lesson is free and works offline. Choose an interface language on the first screen. Listening uses the device's Hebrew voice (AVSpeechSynthesizer); if none is installed, the app explains this and Voice settings opens the app's page in Settings. Rate opens the App Store review page, Share uses the system share sheet and Send feedback opens an email to appsbybros.dev@gmail.com. Progress stays on the device; Settings > Reset learning progress deletes it.",
+  "release_not_done": [
+    "App Store Connect app record (the TestFlight workflow registers the App ID and then names this step)",
+    "Repository secrets ASC_KEY_ID, ASC_ISSUER_ID, ASC_PRIVATE_KEY and APPLE_TEAM_ID",
+    "A successful run of the Verify iOS build and tests workflow (the app has not been compiled yet)",
+    "TestFlight build and checks on a physical iPhone and iPad (speech, VoiceOver, Dynamic Type, right-to-left)",
+    "iPhone 6.9-inch and iPad 13-inch screenshots",
+    "Public hosting of the privacy policy and a support URL",
+    "Final App Review questionnaire and submission"
+  ]
+}

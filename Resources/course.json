@@ -1,0 +1,2442 @@
+{
+  "version": 1,
+  "languages": [
+    "en",
+    "ru",
+    "uk",
+    "fr",
+    "es",
+    "pt",
+    "ar",
+    "am",
+    "de",
+    "he"
+  ],
+  "lessons": [
+    {
+      "id": "hello",
+      "titles": {
+        "en": "First conversations",
+        "ru": "Первые разговоры",
+        "uk": "Перші розмови",
+        "fr": "Premiers échanges",
+        "es": "Primeras conversaciones",
+        "pt": "Primeiras conversas",
+        "ar": "المحادثات الأولى",
+        "am": "የመጀመሪያ ውይይቶች",
+        "de": "Erste Gespräche",
+        "he": "שיחות ראשונות"
+      },
+      "phrases": [
+        {
+          "id": "hello-1",
+          "he": "שָׁלוֹם",
+          "translit": "shalom",
+          "meanings": {
+            "en": "Hello",
+            "ru": "Здравствуйте",
+            "uk": "Вітаю",
+            "fr": "Bonjour",
+            "es": "Hola",
+            "pt": "Olá",
+            "ar": "مرحبًا",
+            "am": "ሰላም",
+            "de": "Hallo",
+            "he": "שלום"
+          },
+          "plain": "שלום"
+        },
+        {
+          "id": "hello-2",
+          "he": "בֹּקֶר טוֹב",
+          "translit": "boker tov",
+          "meanings": {
+            "en": "Good morning",
+            "ru": "Доброе утро",
+            "uk": "Доброго ранку",
+            "fr": "Bonjour (le matin)",
+            "es": "Buenos días",
+            "pt": "Bom dia",
+            "ar": "صباح الخير",
+            "am": "እንደምን አደሩ",
+            "de": "Guten Morgen",
+            "he": "בוקר טוב"
+          },
+          "plain": "בוקר טוב"
+        },
+        {
+          "id": "hello-3",
+          "he": "עֶרֶב טוֹב",
+          "translit": "erev tov",
+          "meanings": {
+            "en": "Good evening",
+            "ru": "Добрый вечер",
+            "uk": "Добрий вечір",
+            "fr": "Bonsoir",
+            "es": "Buenas tardes/noches",
+            "pt": "Boa noite (ao chegar)",
+            "ar": "مساء الخير",
+            "am": "እንደምን አመሹ",
+            "de": "Guten Abend",
+            "he": "ערב טוב"
+          },
+          "plain": "ערב טוב"
+        },
+        {
+          "id": "hello-4",
+          "he": "תּוֹדָה רַבָּה",
+          "translit": "toda raba",
+          "meanings": {
+            "en": "Thank you very much",
+            "ru": "Большое спасибо",
+            "uk": "Дуже дякую",
+            "fr": "Merci beaucoup",
+            "es": "Muchas gracias",
+            "pt": "Muito obrigado/a",
+            "ar": "شكرًا جزيلًا",
+            "am": "በጣም አመሰግናለሁ",
+            "de": "Vielen Dank",
+            "he": "תודה רבה"
+          },
+          "plain": "תודה רבה"
+        },
+        {
+          "id": "hello-5",
+          "he": "בְּבַקָּשָׁה",
+          "translit": "bevakasha",
+          "meanings": {
+            "en": "Please / you're welcome",
+            "ru": "Пожалуйста",
+            "uk": "Будь ласка",
+            "fr": "S'il vous plaît / de rien",
+            "es": "Por favor / de nada",
+            "pt": "Por favor / de nada",
+            "ar": "من فضلك / عفوًا",
+            "am": "እባክዎ / ምንም አይደለም",
+            "de": "Bitte / gern geschehen",
+            "he": "בבקשה"
+          },
+          "plain": "בבקשה"
+        },
+        {
+          "id": "hello-6",
+          "he": "לְהִתְרָאוֹת",
+          "translit": "lehitraot",
+          "meanings": {
+            "en": "Goodbye",
+            "ru": "До свидания",
+            "uk": "До побачення",
+            "fr": "Au revoir",
+            "es": "Hasta luego",
+            "pt": "Até logo",
+            "ar": "إلى اللقاء",
+            "am": "ደህና ይሁኑ",
+            "de": "Auf Wiedersehen",
+            "he": "להתראות"
+          },
+          "plain": "להתראות"
+        }
+      ]
+    },
+    {
+      "id": "introduce",
+      "titles": {
+        "en": "Introduce yourself",
+        "ru": "Знакомство",
+        "uk": "Знайомство",
+        "fr": "Se présenter",
+        "es": "Presentarse",
+        "pt": "Apresentar-se",
+        "ar": "التعريف بالنفس",
+        "am": "ራስን ማስተዋወቅ",
+        "de": "Sich vorstellen",
+        "he": "נעים להכיר"
+      },
+      "phrases": [
+        {
+          "id": "introduce-1",
+          "he": "קוֹרְאִים לִי דָּנִי",
+          "translit": "korim li Dani",
+          "meanings": {
+            "en": "My name is Dani",
+            "ru": "Меня зовут Дани",
+            "uk": "Мене звати Дані",
+            "fr": "Je m'appelle Dani",
+            "es": "Me llamo Dani",
+            "pt": "Meu nome é Dani",
+            "ar": "اسمي داني",
+            "am": "ስሜ ዳኒ ነው",
+            "de": "Ich heiße Dani",
+            "he": "קוראים לי דני"
+          },
+          "plain": "קוראים לי דני"
+        },
+        {
+          "id": "introduce-2",
+          "he": "נָעִים לְהַכִּיר",
+          "translit": "naim lehakir",
+          "meanings": {
+            "en": "Nice to meet you",
+            "ru": "Приятно познакомиться",
+            "uk": "Приємно познайомитися",
+            "fr": "Enchanté/e",
+            "es": "Mucho gusto",
+            "pt": "Prazer em conhecer",
+            "ar": "تشرّفت بمعرفتك",
+            "am": "በመተዋወቃችን ደስ ብሎኛል",
+            "de": "Freut mich",
+            "he": "נעים להכיר"
+          },
+          "plain": "נעים להכיר"
+        },
+        {
+          "id": "introduce-3",
+          "he": "אֲנִי חָדָשׁ פֹּה",
+          "translit": "ani chadash po",
+          "meanings": {
+            "en": "I'm new here",
+            "ru": "Я здесь недавно",
+            "uk": "Я тут нещодавно",
+            "fr": "Je viens d'arriver ici",
+            "es": "Soy nuevo/a aquí",
+            "pt": "Sou novo/a aqui",
+            "ar": "أنا جديد/جديدة هنا",
+            "am": "እዚህ አዲስ ነኝ",
+            "de": "Ich bin neu hier",
+            "he": "אני חדש פה"
+          },
+          "female": "אֲנִי חֲדָשָׁה פֹּה",
+          "femaleTranslit": "ani chadasha po",
+          "plain": "אני חדש פה",
+          "femalePlain": "אני חדשה פה"
+        },
+        {
+          "id": "introduce-4",
+          "he": "אֲנִי לוֹמֵד עִבְרִית",
+          "translit": "ani lomed ivrit",
+          "meanings": {
+            "en": "I'm learning Hebrew",
+            "ru": "Я учу иврит",
+            "uk": "Я вивчаю іврит",
+            "fr": "J'apprends l'hébreu",
+            "es": "Estoy aprendiendo hebreo",
+            "pt": "Estou aprendendo hebraico",
+            "ar": "أنا أتعلّم العبرية",
+            "am": "ዕብራይስጥ እየተማርኩ ነው",
+            "de": "Ich lerne Hebräisch",
+            "he": "אני לומד עברית"
+          },
+          "female": "אֲנִי לוֹמֶדֶת עִבְרִית",
+          "femaleTranslit": "ani lomedet ivrit",
+          "plain": "אני לומד עברית",
+          "femalePlain": "אני לומדת עברית"
+        },
+        {
+          "id": "introduce-5",
+          "he": "אֲנִי גָּר בְּחֵיפָה",
+          "translit": "ani gar beCheifa",
+          "meanings": {
+            "en": "I live in Haifa",
+            "ru": "Я живу в Хайфе",
+            "uk": "Я живу в Хайфі",
+            "fr": "J'habite à Haïfa",
+            "es": "Vivo en Haifa",
+            "pt": "Moro em Haifa",
+            "ar": "أنا أسكن في حيفا",
+            "am": "በሐይፋ እኖራለሁ",
+            "de": "Ich wohne in Haifa",
+            "he": "אני גר בחיפה"
+          },
+          "female": "אֲנִי גָּרָה בְּחֵיפָה",
+          "femaleTranslit": "ani gara beCheifa",
+          "plain": "אני גר בחיפה",
+          "femalePlain": "אני גרה בחיפה"
+        },
+        {
+          "id": "introduce-6",
+          "he": "מֵאֵיפֹה אַתָּה?",
+          "translit": "meeifo ata?",
+          "meanings": {
+            "en": "Where are you from?",
+            "ru": "Откуда вы?",
+            "uk": "Звідки ви?",
+            "fr": "D'où venez-vous ?",
+            "es": "¿De dónde eres?",
+            "pt": "De onde você é?",
+            "ar": "من أين أنت؟",
+            "am": "ከየት ነዎት?",
+            "de": "Woher kommst du?",
+            "he": "מאיפה אתה?"
+          },
+          "female": "מֵאֵיפֹה אַתְּ?",
+          "femaleTranslit": "meeifo at?",
+          "plain": "מאיפה אתה?",
+          "femalePlain": "מאיפה את?"
+        }
+      ]
+    },
+    {
+      "id": "understand",
+      "titles": {
+        "en": "Ask and understand",
+        "ru": "Спросить и понять",
+        "uk": "Запитати й зрозуміти",
+        "fr": "Demander et comprendre",
+        "es": "Preguntar y entender",
+        "pt": "Perguntar e entender",
+        "ar": "السؤال والفهم",
+        "am": "መጠየቅና መረዳት",
+        "de": "Fragen und verstehen",
+        "he": "לשאול ולהבין"
+      },
+      "phrases": [
+        {
+          "id": "understand-1",
+          "he": "סְלִיחָה",
+          "translit": "slicha",
+          "meanings": {
+            "en": "Excuse me / sorry",
+            "ru": "Извините",
+            "uk": "Перепрошую",
+            "fr": "Excusez-moi / pardon",
+            "es": "Disculpa / perdón",
+            "pt": "Com licença / desculpe",
+            "ar": "عذرًا",
+            "am": "ይቅርታ",
+            "de": "Entschuldigung",
+            "he": "סליחה"
+          },
+          "plain": "סליחה"
+        },
+        {
+          "id": "understand-2",
+          "he": "לֹא הֵבַנְתִּי",
+          "translit": "lo hevanti",
+          "meanings": {
+            "en": "I didn't understand",
+            "ru": "Я не понял/а",
+            "uk": "Я не зрозумів/ла",
+            "fr": "Je n'ai pas compris",
+            "es": "No entendí",
+            "pt": "Não entendi",
+            "ar": "لم أفهم",
+            "am": "አልገባኝም",
+            "de": "Ich habe nicht verstanden",
+            "he": "לא הבנתי"
+          },
+          "plain": "לא הבנתי"
+        },
+        {
+          "id": "understand-3",
+          "he": "אֶפְשָׁר לְאַט?",
+          "translit": "efshar leat?",
+          "meanings": {
+            "en": "Could you go slowly?",
+            "ru": "Можно помедленнее?",
+            "uk": "Можна повільніше?",
+            "fr": "Plus lentement, s'il vous plaît ?",
+            "es": "¿Puede ir más despacio?",
+            "pt": "Pode falar devagar?",
+            "ar": "هل يمكن أن تتكلم ببطء؟",
+            "am": "ቀስ ብለው ይናገራሉ?",
+            "de": "Geht es bitte langsamer?",
+            "he": "אפשר לאט?"
+          },
+          "plain": "אפשר לאט?"
+        },
+        {
+          "id": "understand-4",
+          "he": "אֶפְשָׁר שׁוּב?",
+          "translit": "efshar shuv?",
+          "meanings": {
+            "en": "Could you repeat that?",
+            "ru": "Можно ещё раз?",
+            "uk": "Можна ще раз?",
+            "fr": "Pouvez-vous répéter ?",
+            "es": "¿Puede repetirlo?",
+            "pt": "Pode repetir?",
+            "ar": "هل يمكن أن تعيد ذلك؟",
+            "am": "እንደገና ይድገሙልኝ?",
+            "de": "Können Sie das wiederholen?",
+            "he": "אפשר שוב?"
+          },
+          "plain": "אפשר שוב?"
+        },
+        {
+          "id": "understand-5",
+          "he": "מָה זֶה אוֹמֵר?",
+          "translit": "ma ze omer?",
+          "meanings": {
+            "en": "What does this mean?",
+            "ru": "Что это значит?",
+            "uk": "Що це означає?",
+            "fr": "Qu'est-ce que cela veut dire ?",
+            "es": "¿Qué significa esto?",
+            "pt": "O que isso significa?",
+            "ar": "ماذا يعني هذا؟",
+            "am": "ይህ ምን ማለት ነው?",
+            "de": "Was bedeutet das?",
+            "he": "מה זה אומר?"
+          },
+          "plain": "מה זה אומר?"
+        },
+        {
+          "id": "understand-6",
+          "he": "אֵיךְ אוֹמְרִים בְּעִבְרִית?",
+          "translit": "eich omrim beivrit?",
+          "meanings": {
+            "en": "How do you say it in Hebrew?",
+            "ru": "Как это сказать на иврите?",
+            "uk": "Як це сказати івритом?",
+            "fr": "Comment dit-on en hébreu ?",
+            "es": "¿Cómo se dice en hebreo?",
+            "pt": "Como se diz em hebraico?",
+            "ar": "كيف نقول ذلك بالعبرية؟",
+            "am": "በዕብራይስጥ እንዴት ይባላል?",
+            "de": "Wie sagt man das auf Hebräisch?",
+            "he": "איך אומרים בעברית?"
+          },
+          "plain": "איך אומרים בעברית?"
+        }
+      ]
+    },
+    {
+      "id": "people",
+      "titles": {
+        "en": "People around you",
+        "ru": "Люди рядом",
+        "uk": "Люди поруч",
+        "fr": "Les gens autour de vous",
+        "es": "Las personas a tu alrededor",
+        "pt": "As pessoas ao seu redor",
+        "ar": "الناس من حولك",
+        "am": "በዙሪያዎ ያሉ ሰዎች",
+        "de": "Menschen um dich herum",
+        "he": "האנשים סביבנו"
+      },
+      "phrases": [
+        {
+          "id": "people-1",
+          "he": "מִשְׁפָּחָה",
+          "translit": "mishpacha",
+          "meanings": {
+            "en": "Family",
+            "ru": "Семья",
+            "uk": "Родина",
+            "fr": "Famille",
+            "es": "Familia",
+            "pt": "Família",
+            "ar": "عائلة",
+            "am": "ቤተሰብ",
+            "de": "Familie",
+            "he": "משפחה"
+          },
+          "plain": "משפחה"
+        },
+        {
+          "id": "people-2",
+          "he": "חָבֵר",
+          "translit": "chaver",
+          "meanings": {
+            "en": "Friend",
+            "ru": "Друг / подруга",
+            "uk": "Друг / подруга",
+            "fr": "Ami/e",
+            "es": "Amigo/a",
+            "pt": "Amigo/a",
+            "ar": "صديق / صديقة",
+            "am": "ጓደኛ",
+            "de": "Freund / Freundin",
+            "he": "חבר"
+          },
+          "female": "חֲבֵרָה",
+          "femaleTranslit": "chavera",
+          "plain": "חבר",
+          "femalePlain": "חברה"
+        },
+        {
+          "id": "people-3",
+          "he": "שָׁכֵן",
+          "translit": "shachen",
+          "meanings": {
+            "en": "Neighbor",
+            "ru": "Сосед / соседка",
+            "uk": "Сусід / сусідка",
+            "fr": "Voisin/e",
+            "es": "Vecino/a",
+            "pt": "Vizinho/a",
+            "ar": "جار / جارة",
+            "am": "ጎረቤት",
+            "de": "Nachbar / Nachbarin",
+            "he": "שכן"
+          },
+          "female": "שְׁכֵנָה",
+          "femaleTranslit": "shchena",
+          "plain": "שכן",
+          "femalePlain": "שכנה"
+        },
+        {
+          "id": "people-4",
+          "he": "יֵשׁ לִי יְלָדִים",
+          "translit": "yesh li yeladim",
+          "meanings": {
+            "en": "I have children",
+            "ru": "У меня есть дети",
+            "uk": "У мене є діти",
+            "fr": "J'ai des enfants",
+            "es": "Tengo hijos",
+            "pt": "Tenho filhos",
+            "ar": "لديّ أطفال",
+            "am": "ልጆች አሉኝ",
+            "de": "Ich habe Kinder",
+            "he": "יש לי ילדים"
+          },
+          "plain": "יש לי ילדים"
+        },
+        {
+          "id": "people-5",
+          "he": "אֲנַחְנוּ גָּרִים פֹּה",
+          "translit": "anachnu garim po",
+          "meanings": {
+            "en": "We live here",
+            "ru": "Мы живём здесь",
+            "uk": "Ми живемо тут",
+            "fr": "Nous habitons ici",
+            "es": "Vivimos aquí",
+            "pt": "Moramos aqui",
+            "ar": "نحن نسكن هنا",
+            "am": "እዚህ እንኖራለን",
+            "de": "Wir wohnen hier",
+            "he": "אנחנו גרים פה"
+          },
+          "plain": "אנחנו גרים פה"
+        },
+        {
+          "id": "people-6",
+          "he": "מָה שְׁלוֹמְךָ?",
+          "translit": "ma shlomcha?",
+          "meanings": {
+            "en": "How are you?",
+            "ru": "Как дела?",
+            "uk": "Як справи?",
+            "fr": "Comment allez-vous ?",
+            "es": "¿Cómo estás?",
+            "pt": "Como você está?",
+            "ar": "كيف حالك؟",
+            "am": "እንዴት ነዎት?",
+            "de": "Wie geht es dir?",
+            "he": "מה שלומך?"
+          },
+          "female": "מָה שְׁלוֹמֵךְ?",
+          "femaleTranslit": "ma shlomech?",
+          "plain": "מה שלומך?",
+          "femalePlain": "מה שלומך?"
+        }
+      ]
+    },
+    {
+      "id": "numbers",
+      "titles": {
+        "en": "Numbers and prices",
+        "ru": "Числа и цены",
+        "uk": "Числа та ціни",
+        "fr": "Nombres et prix",
+        "es": "Números y precios",
+        "pt": "Números e preços",
+        "ar": "الأرقام والأسعار",
+        "am": "ቁጥሮችና ዋጋዎች",
+        "de": "Zahlen und Preise",
+        "he": "מספרים ומחירים"
+      },
+      "phrases": [
+        {
+          "id": "numbers-1",
+          "he": "אַחַת",
+          "translit": "achat",
+          "meanings": {
+            "en": "One (feminine)",
+            "ru": "Одна (женский род)",
+            "uk": "Одна (жіночий рід)",
+            "fr": "Une (féminin)",
+            "es": "Una (femenino)",
+            "pt": "Uma (feminino)",
+            "ar": "واحدة (صيغة المؤنث)",
+            "am": "አንድ (የሴት ቅርጽ)",
+            "de": "Eins (weibliche Form)",
+            "he": "אחת"
+          },
+          "plain": "אחת"
+        },
+        {
+          "id": "numbers-2",
+          "he": "שְׁתַּיִם",
+          "translit": "shtayim",
+          "meanings": {
+            "en": "Two (feminine)",
+            "ru": "Две (женский род)",
+            "uk": "Дві (жіночий рід)",
+            "fr": "Deux (féminin)",
+            "es": "Dos (femenino)",
+            "pt": "Duas (feminino)",
+            "ar": "اثنتان (صيغة المؤنث)",
+            "am": "ሁለት (የሴት ቅርጽ)",
+            "de": "Zwei (weibliche Form)",
+            "he": "שתיים"
+          },
+          "plain": "שתיים"
+        },
+        {
+          "id": "numbers-3",
+          "he": "שָׁלוֹשׁ",
+          "translit": "shalosh",
+          "meanings": {
+            "en": "Three (feminine)",
+            "ru": "Три (женский род)",
+            "uk": "Три (жіночий рід)",
+            "fr": "Trois (féminin)",
+            "es": "Tres (femenino)",
+            "pt": "Três (feminino)",
+            "ar": "ثلاثة (صيغة المؤنث)",
+            "am": "ሦስት (የሴት ቅርጽ)",
+            "de": "Drei (weibliche Form)",
+            "he": "שלוש"
+          },
+          "plain": "שלוש"
+        },
+        {
+          "id": "numbers-4",
+          "he": "עֶשֶׂר",
+          "translit": "eser",
+          "meanings": {
+            "en": "Ten (feminine)",
+            "ru": "Десять (женский род)",
+            "uk": "Десять (жіночий рід)",
+            "fr": "Dix (féminin)",
+            "es": "Diez (femenino)",
+            "pt": "Dez (feminino)",
+            "ar": "عشرة (صيغة المؤنث)",
+            "am": "አሥር (የሴት ቅርጽ)",
+            "de": "Zehn (weibliche Form)",
+            "he": "עשר"
+          },
+          "plain": "עשר"
+        },
+        {
+          "id": "numbers-5",
+          "he": "כַּמָּה זֶה עוֹלֶה?",
+          "translit": "kama ze ole?",
+          "meanings": {
+            "en": "How much does this cost?",
+            "ru": "Сколько это стоит?",
+            "uk": "Скільки це коштує?",
+            "fr": "Combien ça coûte ?",
+            "es": "¿Cuánto cuesta esto?",
+            "pt": "Quanto custa isso?",
+            "ar": "كم ثمن هذا؟",
+            "am": "ይህ ስንት ነው?",
+            "de": "Wie viel kostet das?",
+            "he": "כמה זה עולה?"
+          },
+          "plain": "כמה זה עולה?"
+        },
+        {
+          "id": "numbers-6",
+          "he": "עֶשְׂרִים שְׁקָלִים",
+          "translit": "esrim shkalim",
+          "meanings": {
+            "en": "Twenty shekels",
+            "ru": "Двадцать шекелей",
+            "uk": "Двадцять шекелів",
+            "fr": "Vingt shekels",
+            "es": "Veinte séqueles",
+            "pt": "Vinte shekels",
+            "ar": "عشرون شيكلًا",
+            "am": "ሃያ ሼክል",
+            "de": "Zwanzig Schekel",
+            "he": "עשרים שקלים"
+          },
+          "plain": "עשרים שקלים"
+        }
+      ]
+    },
+    {
+      "id": "time",
+      "titles": {
+        "en": "Time and days",
+        "ru": "Время и дни",
+        "uk": "Час і дні",
+        "fr": "Heures et jours",
+        "es": "Horas y días",
+        "pt": "Horas e dias",
+        "ar": "الوقت والأيام",
+        "am": "ሰዓትና ቀናት",
+        "de": "Zeit und Tage",
+        "he": "זמן וימים"
+      },
+      "phrases": [
+        {
+          "id": "time-1",
+          "he": "הַיּוֹם",
+          "translit": "hayom",
+          "meanings": {
+            "en": "Today",
+            "ru": "Сегодня",
+            "uk": "Сьогодні",
+            "fr": "Aujourd'hui",
+            "es": "Hoy",
+            "pt": "Hoje",
+            "ar": "اليوم",
+            "am": "ዛሬ",
+            "de": "Heute",
+            "he": "היום"
+          },
+          "plain": "היום"
+        },
+        {
+          "id": "time-2",
+          "he": "מָחָר",
+          "translit": "machar",
+          "meanings": {
+            "en": "Tomorrow",
+            "ru": "Завтра",
+            "uk": "Завтра",
+            "fr": "Demain",
+            "es": "Mañana",
+            "pt": "Amanhã",
+            "ar": "غدًا",
+            "am": "ነገ",
+            "de": "Morgen",
+            "he": "מחר"
+          },
+          "plain": "מחר"
+        },
+        {
+          "id": "time-3",
+          "he": "אֶתְמוֹל",
+          "translit": "etmol",
+          "meanings": {
+            "en": "Yesterday",
+            "ru": "Вчера",
+            "uk": "Учора",
+            "fr": "Hier",
+            "es": "Ayer",
+            "pt": "Ontem",
+            "ar": "أمس",
+            "am": "ትናንት",
+            "de": "Gestern",
+            "he": "אתמול"
+          },
+          "plain": "אתמול"
+        },
+        {
+          "id": "time-4",
+          "he": "מָה הַשָּׁעָה?",
+          "translit": "ma hashaa?",
+          "meanings": {
+            "en": "What time is it?",
+            "ru": "Который час?",
+            "uk": "Котра година?",
+            "fr": "Quelle heure est-il ?",
+            "es": "¿Qué hora es?",
+            "pt": "Que horas são?",
+            "ar": "كم الساعة؟",
+            "am": "ስንት ሰዓት ነው?",
+            "de": "Wie spät ist es?",
+            "he": "מה השעה?"
+          },
+          "plain": "מה השעה?"
+        },
+        {
+          "id": "time-5",
+          "he": "בְּיוֹם רִאשׁוֹן",
+          "translit": "beyom rishon",
+          "meanings": {
+            "en": "On Sunday",
+            "ru": "В воскресенье",
+            "uk": "У неділю",
+            "fr": "Dimanche",
+            "es": "El domingo",
+            "pt": "No domingo",
+            "ar": "يوم الأحد",
+            "am": "እሁድ ቀን",
+            "de": "Am Sonntag",
+            "he": "ביום ראשון"
+          },
+          "plain": "ביום ראשון"
+        },
+        {
+          "id": "time-6",
+          "he": "בְּשָׁעָה שָׁלוֹשׁ",
+          "translit": "beshaa shalosh",
+          "meanings": {
+            "en": "At three o'clock",
+            "ru": "В три часа",
+            "uk": "О третій годині",
+            "fr": "À trois heures",
+            "es": "A las tres",
+            "pt": "Às três horas",
+            "ar": "الساعة الثالثة",
+            "am": "በሦስት ሰዓት",
+            "de": "Um drei Uhr",
+            "he": "בשעה שלוש"
+          },
+          "plain": "בשעה שלוש"
+        }
+      ]
+    },
+    {
+      "id": "cafe",
+      "titles": {
+        "en": "At the café",
+        "ru": "В кафе",
+        "uk": "У кав’ярні",
+        "fr": "Au café",
+        "es": "En la cafetería",
+        "pt": "No café",
+        "ar": "في المقهى",
+        "am": "በቡና ቤት",
+        "de": "Im Café",
+        "he": "בבית הקפה"
+      },
+      "phrases": [
+        {
+          "id": "cafe-1",
+          "he": "קָפֶה בְּבַקָּשָׁה",
+          "translit": "kafe bevakasha",
+          "meanings": {
+            "en": "Coffee, please",
+            "ru": "Кофе, пожалуйста",
+            "uk": "Каву, будь ласка",
+            "fr": "Un café, s'il vous plaît",
+            "es": "Un café, por favor",
+            "pt": "Um café, por favor",
+            "ar": "قهوة من فضلك",
+            "am": "ቡና እባክዎ",
+            "de": "Einen Kaffee, bitte",
+            "he": "קפה בבקשה"
+          },
+          "plain": "קפה בבקשה"
+        },
+        {
+          "id": "cafe-2",
+          "he": "מַיִם קָרִים",
+          "translit": "mayim karim",
+          "meanings": {
+            "en": "Cold water",
+            "ru": "Холодная вода",
+            "uk": "Холодна вода",
+            "fr": "Eau froide",
+            "es": "Agua fría",
+            "pt": "Água fria",
+            "ar": "ماء بارد",
+            "am": "ቀዝቃዛ ውሃ",
+            "de": "Kaltes Wasser",
+            "he": "מים קרים"
+          },
+          "plain": "מים קרים"
+        },
+        {
+          "id": "cafe-3",
+          "he": "בְּלִי סֻכָּר",
+          "translit": "bli sukar",
+          "meanings": {
+            "en": "Without sugar",
+            "ru": "Без сахара",
+            "uk": "Без цукру",
+            "fr": "Sans sucre",
+            "es": "Sin azúcar",
+            "pt": "Sem açúcar",
+            "ar": "بدون سكر",
+            "am": "ያለ ስኳር",
+            "de": "Ohne Zucker",
+            "he": "בלי סוכר"
+          },
+          "plain": "בלי סוכר"
+        },
+        {
+          "id": "cafe-4",
+          "he": "עִם חָלָב",
+          "translit": "im chalav",
+          "meanings": {
+            "en": "With milk",
+            "ru": "С молоком",
+            "uk": "З молоком",
+            "fr": "Avec du lait",
+            "es": "Con leche",
+            "pt": "Com leite",
+            "ar": "مع الحليب",
+            "am": "ከወተት ጋር",
+            "de": "Mit Milch",
+            "he": "עם חלב"
+          },
+          "plain": "עם חלב"
+        },
+        {
+          "id": "cafe-5",
+          "he": "לָקַחַת בְּבַקָּשָׁה",
+          "translit": "lakachat bevakasha",
+          "meanings": {
+            "en": "To take away, please",
+            "ru": "С собой, пожалуйста",
+            "uk": "Із собою, будь ласка",
+            "fr": "À emporter, s'il vous plaît",
+            "es": "Para llevar, por favor",
+            "pt": "Para levar, por favor",
+            "ar": "للسفري من فضلك",
+            "am": "ለመውሰድ እባክዎ",
+            "de": "Zum Mitnehmen, bitte",
+            "he": "לקחת בבקשה"
+          },
+          "plain": "לקחת בבקשה"
+        },
+        {
+          "id": "cafe-6",
+          "he": "חֶשְׁבּוֹן בְּבַקָּשָׁה",
+          "translit": "cheshbon bevakasha",
+          "meanings": {
+            "en": "The bill, please",
+            "ru": "Счёт, пожалуйста",
+            "uk": "Рахунок, будь ласка",
+            "fr": "L'addition, s'il vous plaît",
+            "es": "La cuenta, por favor",
+            "pt": "A conta, por favor",
+            "ar": "الحساب من فضلك",
+            "am": "ሂሳቡን እባክዎ",
+            "de": "Die Rechnung, bitte",
+            "he": "חשבון בבקשה"
+          },
+          "plain": "חשבון בבקשה"
+        }
+      ]
+    },
+    {
+      "id": "market",
+      "titles": {
+        "en": "At the market",
+        "ru": "На рынке",
+        "uk": "На ринку",
+        "fr": "Au marché",
+        "es": "En el mercado",
+        "pt": "No mercado",
+        "ar": "في السوق",
+        "am": "በገበያ",
+        "de": "Auf dem Markt",
+        "he": "בשוק"
+      },
+      "phrases": [
+        {
+          "id": "market-1",
+          "he": "לֶחֶם",
+          "translit": "lechem",
+          "meanings": {
+            "en": "Bread",
+            "ru": "Хлеб",
+            "uk": "Хліб",
+            "fr": "Pain",
+            "es": "Pan",
+            "pt": "Pão",
+            "ar": "خبز",
+            "am": "ዳቦ",
+            "de": "Brot",
+            "he": "לחם"
+          },
+          "plain": "לחם"
+        },
+        {
+          "id": "market-2",
+          "he": "יְרָקוֹת",
+          "translit": "yerakot",
+          "meanings": {
+            "en": "Vegetables",
+            "ru": "Овощи",
+            "uk": "Овочі",
+            "fr": "Légumes",
+            "es": "Verduras",
+            "pt": "Legumes",
+            "ar": "خضروات",
+            "am": "አትክልት",
+            "de": "Gemüse",
+            "he": "ירקות"
+          },
+          "plain": "ירקות"
+        },
+        {
+          "id": "market-3",
+          "he": "פֵּרוֹת",
+          "translit": "perot",
+          "meanings": {
+            "en": "Fruit",
+            "ru": "Фрукты",
+            "uk": "Фрукти",
+            "fr": "Fruits",
+            "es": "Fruta",
+            "pt": "Frutas",
+            "ar": "فاكهة",
+            "am": "ፍራፍሬ",
+            "de": "Obst",
+            "he": "פירות"
+          },
+          "plain": "פירות"
+        },
+        {
+          "id": "market-4",
+          "he": "קִילוֹ אֶחָד",
+          "translit": "kilo echad",
+          "meanings": {
+            "en": "One kilogram",
+            "ru": "Один килограмм",
+            "uk": "Один кілограм",
+            "fr": "Un kilogramme",
+            "es": "Un kilogramo",
+            "pt": "Um quilo",
+            "ar": "كيلوغرام واحد",
+            "am": "አንድ ኪሎ",
+            "de": "Ein Kilogramm",
+            "he": "קילו אחד"
+          },
+          "plain": "קילו אחד"
+        },
+        {
+          "id": "market-5",
+          "he": "אֶפְשָׁר שַׂקִּית?",
+          "translit": "efshar sakit?",
+          "meanings": {
+            "en": "Could I have a bag?",
+            "ru": "Можно пакет?",
+            "uk": "Можна пакет?",
+            "fr": "Puis-je avoir un sac ?",
+            "es": "¿Me da una bolsa?",
+            "pt": "Pode me dar uma sacola?",
+            "ar": "هل يمكنني الحصول على كيس؟",
+            "am": "ከረጢት ማግኘት እችላለሁ?",
+            "de": "Kann ich eine Tüte haben?",
+            "he": "אפשר שקית?"
+          },
+          "plain": "אפשר שקית?"
+        },
+        {
+          "id": "market-6",
+          "he": "אֶפְשָׁר בְּאַשְׁרַאי?",
+          "translit": "efshar beashrai?",
+          "meanings": {
+            "en": "Can I pay by card?",
+            "ru": "Можно картой?",
+            "uk": "Можна карткою?",
+            "fr": "Puis-je payer par carte ?",
+            "es": "¿Puedo pagar con tarjeta?",
+            "pt": "Posso pagar com cartão?",
+            "ar": "هل يمكن الدفع بالبطاقة؟",
+            "am": "በካርድ መክፈል እችላለሁ?",
+            "de": "Kann ich mit Karte zahlen?",
+            "he": "אפשר באשראי?"
+          },
+          "plain": "אפשר באשראי?"
+        }
+      ]
+    },
+    {
+      "id": "directions",
+      "titles": {
+        "en": "Find your way",
+        "ru": "Найти дорогу",
+        "uk": "Знайти дорогу",
+        "fr": "Trouver son chemin",
+        "es": "Orientarse",
+        "pt": "Encontrar o caminho",
+        "ar": "إيجاد الطريق",
+        "am": "መንገድ ማግኘት",
+        "de": "Den Weg finden",
+        "he": "למצוא את הדרך"
+      },
+      "phrases": [
+        {
+          "id": "directions-1",
+          "he": "אֵיפֹה הַתַּחֲנָה?",
+          "translit": "eifo hatachana?",
+          "meanings": {
+            "en": "Where is the station?",
+            "ru": "Где станция?",
+            "uk": "Де станція?",
+            "fr": "Où est la station ?",
+            "es": "¿Dónde está la estación?",
+            "pt": "Onde fica a estação?",
+            "ar": "أين المحطة؟",
+            "am": "ጣቢያው የት ነው?",
+            "de": "Wo ist die Station?",
+            "he": "איפה התחנה?"
+          },
+          "plain": "איפה התחנה?"
+        },
+        {
+          "id": "directions-2",
+          "he": "יָמִינָה",
+          "translit": "yamina",
+          "meanings": {
+            "en": "To the right",
+            "ru": "Направо",
+            "uk": "Праворуч",
+            "fr": "À droite",
+            "es": "A la derecha",
+            "pt": "À direita",
+            "ar": "إلى اليمين",
+            "am": "ወደ ቀኝ",
+            "de": "Nach rechts",
+            "he": "ימינה"
+          },
+          "plain": "ימינה"
+        },
+        {
+          "id": "directions-3",
+          "he": "שְׂמֹאלָה",
+          "translit": "smola",
+          "meanings": {
+            "en": "To the left",
+            "ru": "Налево",
+            "uk": "Ліворуч",
+            "fr": "À gauche",
+            "es": "A la izquierda",
+            "pt": "À esquerda",
+            "ar": "إلى اليسار",
+            "am": "ወደ ግራ",
+            "de": "Nach links",
+            "he": "שמאלה"
+          },
+          "plain": "שמאלה"
+        },
+        {
+          "id": "directions-4",
+          "he": "יָשָׁר",
+          "translit": "yashar",
+          "meanings": {
+            "en": "Straight ahead",
+            "ru": "Прямо",
+            "uk": "Прямо",
+            "fr": "Tout droit",
+            "es": "Todo recto",
+            "pt": "Em frente",
+            "ar": "إلى الأمام مباشرة",
+            "am": "ቀጥ ብለው",
+            "de": "Geradeaus",
+            "he": "ישר"
+          },
+          "plain": "ישר"
+        },
+        {
+          "id": "directions-5",
+          "he": "קָרוֹב לְכָאן",
+          "translit": "karov lechan",
+          "meanings": {
+            "en": "Near here",
+            "ru": "Рядом отсюда",
+            "uk": "Поруч звідси",
+            "fr": "Près d'ici",
+            "es": "Cerca de aquí",
+            "pt": "Perto daqui",
+            "ar": "قريب من هنا",
+            "am": "ከዚህ አቅራቢያ",
+            "de": "In der Nähe",
+            "he": "קרוב לכאן"
+          },
+          "plain": "קרוב לכאן"
+        },
+        {
+          "id": "directions-6",
+          "he": "אֲנִי מְחַפֵּשׂ אֶת הָרְחוֹב",
+          "translit": "ani mechapes et harechov",
+          "meanings": {
+            "en": "I'm looking for the street",
+            "ru": "Я ищу эту улицу",
+            "uk": "Я шукаю цю вулицю",
+            "fr": "Je cherche cette rue",
+            "es": "Estoy buscando la calle",
+            "pt": "Estou procurando a rua",
+            "ar": "أنا أبحث عن الشارع",
+            "am": "መንገዱን እየፈለግኩ ነው",
+            "de": "Ich suche die Straße",
+            "he": "אני מחפש את הרחוב"
+          },
+          "female": "אֲנִי מְחַפֶּשֶׂת אֶת הָרְחוֹב",
+          "femaleTranslit": "ani mechapeset et harechov",
+          "plain": "אני מחפש את הרחוב",
+          "femalePlain": "אני מחפשת את הרחוב"
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "titles": {
+        "en": "Bus and train",
+        "ru": "Автобус и поезд",
+        "uk": "Автобус і потяг",
+        "fr": "Bus et train",
+        "es": "Autobús y tren",
+        "pt": "Ônibus e trem",
+        "ar": "الحافلة والقطار",
+        "am": "አውቶቡስና ባቡር",
+        "de": "Bus und Bahn",
+        "he": "אוטובוס ורכבת"
+      },
+      "phrases": [
+        {
+          "id": "transport-1",
+          "he": "אוֹטוֹבּוּס",
+          "translit": "otobus",
+          "meanings": {
+            "en": "Bus",
+            "ru": "Автобус",
+            "uk": "Автобус",
+            "fr": "Bus",
+            "es": "Autobús",
+            "pt": "Ônibus",
+            "ar": "حافلة",
+            "am": "አውቶቡስ",
+            "de": "Bus",
+            "he": "אוטובוס"
+          },
+          "plain": "אוטובוס"
+        },
+        {
+          "id": "transport-2",
+          "he": "רַכֶּבֶת",
+          "translit": "rakevet",
+          "meanings": {
+            "en": "Train",
+            "ru": "Поезд",
+            "uk": "Потяг",
+            "fr": "Train",
+            "es": "Tren",
+            "pt": "Trem",
+            "ar": "قطار",
+            "am": "ባቡር",
+            "de": "Zug",
+            "he": "רכבת"
+          },
+          "plain": "רכבת"
+        },
+        {
+          "id": "transport-3",
+          "he": "כַּרְטִיס",
+          "translit": "kartis",
+          "meanings": {
+            "en": "Ticket / card",
+            "ru": "Билет / карточка",
+            "uk": "Квиток / картка",
+            "fr": "Billet / carte",
+            "es": "Billete / tarjeta",
+            "pt": "Bilhete / cartão",
+            "ar": "تذكرة / بطاقة",
+            "am": "ትኬት / ካርድ",
+            "de": "Fahrkarte / Karte",
+            "he": "כרטיס"
+          },
+          "plain": "כרטיס"
+        },
+        {
+          "id": "transport-4",
+          "he": "מָתַי הָאוֹטוֹבּוּס בָּא?",
+          "translit": "matai haotobus ba?",
+          "meanings": {
+            "en": "When does the bus come?",
+            "ru": "Когда придёт автобус?",
+            "uk": "Коли приїде автобус?",
+            "fr": "Quand arrive le bus ?",
+            "es": "¿Cuándo viene el autobús?",
+            "pt": "Quando vem o ônibus?",
+            "ar": "متى تأتي الحافلة؟",
+            "am": "አውቶቡሱ መቼ ይመጣል?",
+            "de": "Wann kommt der Bus?",
+            "he": "מתי האוטובוס בא?"
+          },
+          "plain": "מתי האוטובוס בא?"
+        },
+        {
+          "id": "transport-5",
+          "he": "הַתַּחֲנָה הַבָּאָה",
+          "translit": "hatachana habaa",
+          "meanings": {
+            "en": "The next stop",
+            "ru": "Следующая остановка",
+            "uk": "Наступна зупинка",
+            "fr": "Le prochain arrêt",
+            "es": "La próxima parada",
+            "pt": "A próxima parada",
+            "ar": "المحطة التالية",
+            "am": "ቀጣዩ መቆሚያ",
+            "de": "Die nächste Haltestelle",
+            "he": "התחנה הבאה"
+          },
+          "plain": "התחנה הבאה"
+        },
+        {
+          "id": "transport-6",
+          "he": "אֲנִי יוֹרֵד פֹּה",
+          "translit": "ani yored po",
+          "meanings": {
+            "en": "I'm getting off here",
+            "ru": "Я выхожу здесь",
+            "uk": "Я виходжу тут",
+            "fr": "Je descends ici",
+            "es": "Me bajo aquí",
+            "pt": "Vou descer aqui",
+            "ar": "سأنزل هنا",
+            "am": "እዚህ እወርዳለሁ",
+            "de": "Ich steige hier aus",
+            "he": "אני יורד פה"
+          },
+          "female": "אֲנִי יוֹרֶדֶת פֹּה",
+          "femaleTranslit": "ani yoredet po",
+          "plain": "אני יורד פה",
+          "femalePlain": "אני יורדת פה"
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "titles": {
+        "en": "At home",
+        "ru": "Дома",
+        "uk": "Удома",
+        "fr": "À la maison",
+        "es": "En casa",
+        "pt": "Em casa",
+        "ar": "في البيت",
+        "am": "በቤት",
+        "de": "Zu Hause",
+        "he": "בבית"
+      },
+      "phrases": [
+        {
+          "id": "home-1",
+          "he": "בַּיִת",
+          "translit": "bayit",
+          "meanings": {
+            "en": "House / home",
+            "ru": "Дом",
+            "uk": "Дім",
+            "fr": "Maison",
+            "es": "Casa",
+            "pt": "Casa",
+            "ar": "بيت",
+            "am": "ቤት",
+            "de": "Haus / Zuhause",
+            "he": "בית"
+          },
+          "plain": "בית"
+        },
+        {
+          "id": "home-2",
+          "he": "חֶדֶר",
+          "translit": "cheder",
+          "meanings": {
+            "en": "Room",
+            "ru": "Комната",
+            "uk": "Кімната",
+            "fr": "Pièce",
+            "es": "Habitación",
+            "pt": "Quarto",
+            "ar": "غرفة",
+            "am": "ክፍል",
+            "de": "Zimmer",
+            "he": "חדר"
+          },
+          "plain": "חדר"
+        },
+        {
+          "id": "home-3",
+          "he": "מִטְבָּח",
+          "translit": "mitbach",
+          "meanings": {
+            "en": "Kitchen",
+            "ru": "Кухня",
+            "uk": "Кухня",
+            "fr": "Cuisine",
+            "es": "Cocina",
+            "pt": "Cozinha",
+            "ar": "مطبخ",
+            "am": "ወጥ ቤት",
+            "de": "Küche",
+            "he": "מטבח"
+          },
+          "plain": "מטבח"
+        },
+        {
+          "id": "home-4",
+          "he": "מַפְתֵּחַ",
+          "translit": "mafteach",
+          "meanings": {
+            "en": "Key",
+            "ru": "Ключ",
+            "uk": "Ключ",
+            "fr": "Clé",
+            "es": "Llave",
+            "pt": "Chave",
+            "ar": "مفتاح",
+            "am": "ቁልፍ",
+            "de": "Schlüssel",
+            "he": "מפתח"
+          },
+          "plain": "מפתח"
+        },
+        {
+          "id": "home-5",
+          "he": "אֵין מַיִם חַמִּים",
+          "translit": "ein mayim chamim",
+          "meanings": {
+            "en": "There is no hot water",
+            "ru": "Нет горячей воды",
+            "uk": "Немає гарячої води",
+            "fr": "Il n'y a pas d'eau chaude",
+            "es": "No hay agua caliente",
+            "pt": "Não há água quente",
+            "ar": "لا يوجد ماء ساخن",
+            "am": "ሙቅ ውሃ የለም",
+            "de": "Es gibt kein warmes Wasser",
+            "he": "אין מים חמים"
+          },
+          "plain": "אין מים חמים"
+        },
+        {
+          "id": "home-6",
+          "he": "יֵשׁ בְּעָיָה",
+          "translit": "yesh beaya",
+          "meanings": {
+            "en": "There is a problem",
+            "ru": "Есть проблема",
+            "uk": "Є проблема",
+            "fr": "Il y a un problème",
+            "es": "Hay un problema",
+            "pt": "Há um problema",
+            "ar": "هناك مشكلة",
+            "am": "ችግር አለ",
+            "de": "Es gibt ein Problem",
+            "he": "יש בעיה"
+          },
+          "plain": "יש בעיה"
+        }
+      ]
+    },
+    {
+      "id": "rent",
+      "titles": {
+        "en": "Looking for a home",
+        "ru": "Поиск жилья",
+        "uk": "Пошук житла",
+        "fr": "Chercher un logement",
+        "es": "Buscar vivienda",
+        "pt": "Procurar moradia",
+        "ar": "البحث عن سكن",
+        "am": "መኖሪያ መፈለግ",
+        "de": "Eine Wohnung suchen",
+        "he": "מחפשים דירה"
+      },
+      "phrases": [
+        {
+          "id": "rent-1",
+          "he": "דִּירָה לְהַשְׂכָּרָה",
+          "translit": "dira lehaskara",
+          "meanings": {
+            "en": "Apartment for rent",
+            "ru": "Квартира в аренду",
+            "uk": "Квартира в оренду",
+            "fr": "Appartement à louer",
+            "es": "Piso en alquiler",
+            "pt": "Apartamento para alugar",
+            "ar": "شقة للإيجار",
+            "am": "የሚከራይ አፓርታማ",
+            "de": "Wohnung zu vermieten",
+            "he": "דירה להשכרה"
+          },
+          "plain": "דירה להשכרה"
+        },
+        {
+          "id": "rent-2",
+          "he": "כַּמָּה חֲדָרִים?",
+          "translit": "kama chadarim?",
+          "meanings": {
+            "en": "How many rooms?",
+            "ru": "Сколько комнат?",
+            "uk": "Скільки кімнат?",
+            "fr": "Combien de pièces ?",
+            "es": "¿Cuántas habitaciones?",
+            "pt": "Quantos cômodos?",
+            "ar": "كم غرفة؟",
+            "am": "ስንት ክፍሎች አሉ?",
+            "de": "Wie viele Zimmer?",
+            "he": "כמה חדרים?"
+          },
+          "plain": "כמה חדרים?"
+        },
+        {
+          "id": "rent-3",
+          "he": "יֵשׁ מַעֲלִית?",
+          "translit": "yesh maalit?",
+          "meanings": {
+            "en": "Is there an elevator?",
+            "ru": "Есть лифт?",
+            "uk": "Є ліфт?",
+            "fr": "Y a-t-il un ascenseur ?",
+            "es": "¿Hay ascensor?",
+            "pt": "Tem elevador?",
+            "ar": "هل يوجد مصعد؟",
+            "am": "ሊፍት አለ?",
+            "de": "Gibt es einen Aufzug?",
+            "he": "יש מעלית?"
+          },
+          "plain": "יש מעלית?"
+        },
+        {
+          "id": "rent-4",
+          "he": "אֶפְשָׁר לִרְאוֹת אֶת הַדִּירָה?",
+          "translit": "efshar lirot et hadira?",
+          "meanings": {
+            "en": "Can I see the apartment?",
+            "ru": "Можно посмотреть квартиру?",
+            "uk": "Можна подивитися квартиру?",
+            "fr": "Puis-je visiter l'appartement ?",
+            "es": "¿Puedo ver el piso?",
+            "pt": "Posso ver o apartamento?",
+            "ar": "هل يمكنني رؤية الشقة؟",
+            "am": "አፓርታማውን ማየት እችላለሁ?",
+            "de": "Kann ich die Wohnung ansehen?",
+            "he": "אפשר לראות את הדירה?"
+          },
+          "plain": "אפשר לראות את הדירה?"
+        },
+        {
+          "id": "rent-5",
+          "he": "מָתַי אֶפְשָׁר לְהִיכָּנֵס?",
+          "translit": "matai efshar lehikanes?",
+          "meanings": {
+            "en": "When can I move in?",
+            "ru": "Когда можно въехать?",
+            "uk": "Коли можна в’їхати?",
+            "fr": "Quand peut-on emménager ?",
+            "es": "¿Cuándo puedo mudarme?",
+            "pt": "Quando posso me mudar?",
+            "ar": "متى يمكن الانتقال للسكن؟",
+            "am": "መቼ መግባት ይቻላል?",
+            "de": "Wann kann ich einziehen?",
+            "he": "מתי אפשר להיכנס?"
+          },
+          "plain": "מתי אפשר להיכנס?"
+        },
+        {
+          "id": "rent-6",
+          "he": "אֲנִי צָרִיךְ לַחְשֹׁב",
+          "translit": "ani tzarich lachshov",
+          "meanings": {
+            "en": "I need to think",
+            "ru": "Мне нужно подумать",
+            "uk": "Мені треба подумати",
+            "fr": "J'ai besoin de réfléchir",
+            "es": "Necesito pensarlo",
+            "pt": "Preciso pensar",
+            "ar": "أحتاج أن أفكّر",
+            "am": "ማሰብ አለብኝ",
+            "de": "Ich muss nachdenken",
+            "he": "אני צריך לחשוב"
+          },
+          "female": "אֲנִי צְרִיכָה לַחְשֹׁב",
+          "femaleTranslit": "ani tzricha lachshov",
+          "plain": "אני צריך לחשוב",
+          "femalePlain": "אני צריכה לחשוב"
+        }
+      ]
+    },
+    {
+      "id": "clinic",
+      "titles": {
+        "en": "At the clinic",
+        "ru": "В поликлинике",
+        "uk": "У поліклініці",
+        "fr": "Au centre médical",
+        "es": "En el centro de salud",
+        "pt": "No centro de saúde",
+        "ar": "في العيادة",
+        "am": "በክሊኒክ",
+        "de": "In der Praxis",
+        "he": "במרפאה"
+      },
+      "phrases": [
+        {
+          "id": "clinic-1",
+          "he": "יֵשׁ לִי תּוֹר",
+          "translit": "yesh li tor",
+          "meanings": {
+            "en": "I have an appointment",
+            "ru": "У меня назначен приём",
+            "uk": "У мене призначено прийом",
+            "fr": "J'ai rendez-vous",
+            "es": "Tengo cita",
+            "pt": "Tenho uma consulta marcada",
+            "ar": "لديّ موعد",
+            "am": "ቀጠሮ አለኝ",
+            "de": "Ich habe einen Termin",
+            "he": "יש לי תור"
+          },
+          "plain": "יש לי תור"
+        },
+        {
+          "id": "clinic-2",
+          "he": "אֲנִי צָרִיךְ עֶזְרָה",
+          "translit": "ani tzarich ezra",
+          "meanings": {
+            "en": "I need help",
+            "ru": "Мне нужна помощь",
+            "uk": "Мені потрібна допомога",
+            "fr": "J'ai besoin d'aide",
+            "es": "Necesito ayuda",
+            "pt": "Preciso de ajuda",
+            "ar": "أحتاج مساعدة",
+            "am": "እርዳታ እፈልጋለሁ",
+            "de": "Ich brauche Hilfe",
+            "he": "אני צריך עזרה"
+          },
+          "female": "אֲנִי צְרִיכָה עֶזְרָה",
+          "femaleTranslit": "ani tzricha ezra",
+          "plain": "אני צריך עזרה",
+          "femalePlain": "אני צריכה עזרה"
+        },
+        {
+          "id": "clinic-3",
+          "he": "אֲנִי לֹא מַרְגִּישׁ טוֹב",
+          "translit": "ani lo margish tov",
+          "meanings": {
+            "en": "I don't feel well",
+            "ru": "Я плохо себя чувствую",
+            "uk": "Я погано почуваюся",
+            "fr": "Je ne me sens pas bien",
+            "es": "No me siento bien",
+            "pt": "Não me sinto bem",
+            "ar": "لا أشعر أنني بخير",
+            "am": "ጥሩ አይሰማኝም",
+            "de": "Mir geht es nicht gut",
+            "he": "אני לא מרגיש טוב"
+          },
+          "female": "אֲנִי לֹא מַרְגִּישָׁה טוֹב",
+          "femaleTranslit": "ani lo margisha tov",
+          "plain": "אני לא מרגיש טוב",
+          "femalePlain": "אני לא מרגישה טוב"
+        },
+        {
+          "id": "clinic-4",
+          "he": "כּוֹאֵב לִי פֹּה",
+          "translit": "koev li po",
+          "meanings": {
+            "en": "It hurts here",
+            "ru": "У меня болит здесь",
+            "uk": "У мене болить тут",
+            "fr": "J'ai mal ici",
+            "es": "Me duele aquí",
+            "pt": "Dói aqui",
+            "ar": "يؤلمني هنا",
+            "am": "እዚህ ያመኛል",
+            "de": "Hier tut es weh",
+            "he": "כואב לי פה"
+          },
+          "plain": "כואב לי פה"
+        },
+        {
+          "id": "clinic-5",
+          "he": "בֵּית מִרְקַחַת",
+          "translit": "beit mirkachat",
+          "meanings": {
+            "en": "Pharmacy",
+            "ru": "Аптека",
+            "uk": "Аптека",
+            "fr": "Pharmacie",
+            "es": "Farmacia",
+            "pt": "Farmácia",
+            "ar": "صيدلية",
+            "am": "መድኃኒት ቤት",
+            "de": "Apotheke",
+            "he": "בית מרקחת"
+          },
+          "plain": "בית מרקחת"
+        },
+        {
+          "id": "clinic-6",
+          "he": "אֶפְשָׁר לִכְתֹּב לִי?",
+          "translit": "efshar lichtov li?",
+          "meanings": {
+            "en": "Could you write it down for me?",
+            "ru": "Можете мне записать?",
+            "uk": "Можете мені записати?",
+            "fr": "Pouvez-vous me l'écrire ?",
+            "es": "¿Puede escribírmelo?",
+            "pt": "Pode escrever para mim?",
+            "ar": "هل يمكنك كتابته لي؟",
+            "am": "ሊጽፉልኝ ይችላሉ?",
+            "de": "Können Sie es mir aufschreiben?",
+            "he": "אפשר לכתוב לי?"
+          },
+          "plain": "אפשר לכתוב לי?"
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "titles": {
+        "en": "At work",
+        "ru": "На работе",
+        "uk": "На роботі",
+        "fr": "Au travail",
+        "es": "En el trabajo",
+        "pt": "No trabalho",
+        "ar": "في العمل",
+        "am": "በሥራ",
+        "de": "Bei der Arbeit",
+        "he": "בעבודה"
+      },
+      "phrases": [
+        {
+          "id": "work-1",
+          "he": "אֲנִי מְחַפֵּשׂ עֲבוֹדָה",
+          "translit": "ani mechapes avoda",
+          "meanings": {
+            "en": "I'm looking for work",
+            "ru": "Я ищу работу",
+            "uk": "Я шукаю роботу",
+            "fr": "Je cherche du travail",
+            "es": "Busco trabajo",
+            "pt": "Estou procurando trabalho",
+            "ar": "أنا أبحث عن عمل",
+            "am": "ሥራ እየፈለግኩ ነው",
+            "de": "Ich suche Arbeit",
+            "he": "אני מחפש עבודה"
+          },
+          "female": "אֲנִי מְחַפֶּשֶׂת עֲבוֹדָה",
+          "femaleTranslit": "ani mechapeset avoda",
+          "plain": "אני מחפש עבודה",
+          "femalePlain": "אני מחפשת עבודה"
+        },
+        {
+          "id": "work-2",
+          "he": "יֵשׁ לִי נִסָּיוֹן",
+          "translit": "yesh li nisayon",
+          "meanings": {
+            "en": "I have experience",
+            "ru": "У меня есть опыт",
+            "uk": "У мене є досвід",
+            "fr": "J'ai de l'expérience",
+            "es": "Tengo experiencia",
+            "pt": "Tenho experiência",
+            "ar": "لديّ خبرة",
+            "am": "ልምድ አለኝ",
+            "de": "Ich habe Erfahrung",
+            "he": "יש לי ניסיון"
+          },
+          "plain": "יש לי ניסיון"
+        },
+        {
+          "id": "work-3",
+          "he": "מָתַי מַתְחִילִים?",
+          "translit": "matai matchilim?",
+          "meanings": {
+            "en": "When do we start?",
+            "ru": "Когда начинаем?",
+            "uk": "Коли починаємо?",
+            "fr": "Quand commence-t-on ?",
+            "es": "¿Cuándo empezamos?",
+            "pt": "Quando começamos?",
+            "ar": "متى نبدأ؟",
+            "am": "መቼ እንጀምራለን?",
+            "de": "Wann fangen wir an?",
+            "he": "מתי מתחילים?"
+          },
+          "plain": "מתי מתחילים?"
+        },
+        {
+          "id": "work-4",
+          "he": "אֶפְשָׁר הַפְסָקָה?",
+          "translit": "efshar hafsaka?",
+          "meanings": {
+            "en": "Could we take a break?",
+            "ru": "Можно перерыв?",
+            "uk": "Можна перерву?",
+            "fr": "Peut-on faire une pause ?",
+            "es": "¿Podemos hacer una pausa?",
+            "pt": "Podemos fazer uma pausa?",
+            "ar": "هل يمكن أخذ استراحة؟",
+            "am": "እረፍት መውሰድ እንችላለን?",
+            "de": "Können wir eine Pause machen?",
+            "he": "אפשר הפסקה?"
+          },
+          "plain": "אפשר הפסקה?"
+        },
+        {
+          "id": "work-5",
+          "he": "אֲנִי מוּכָן",
+          "translit": "ani muchan",
+          "meanings": {
+            "en": "I'm ready",
+            "ru": "Я готов/а",
+            "uk": "Я готовий/а",
+            "fr": "Je suis prêt/e",
+            "es": "Estoy listo/a",
+            "pt": "Estou pronto/a",
+            "ar": "أنا جاهز/جاهزة",
+            "am": "ዝግጁ ነኝ",
+            "de": "Ich bin bereit",
+            "he": "אני מוכן"
+          },
+          "female": "אֲנִי מוּכָנָה",
+          "femaleTranslit": "ani muchana",
+          "plain": "אני מוכן",
+          "femalePlain": "אני מוכנה"
+        },
+        {
+          "id": "work-6",
+          "he": "נִתְרָאֶה מָחָר",
+          "translit": "nitrae machar",
+          "meanings": {
+            "en": "See you tomorrow",
+            "ru": "Увидимся завтра",
+            "uk": "Побачимося завтра",
+            "fr": "À demain",
+            "es": "Hasta mañana",
+            "pt": "Até amanhã",
+            "ar": "أراك غدًا",
+            "am": "ነገ እንገናኝ",
+            "de": "Bis morgen",
+            "he": "נתראה מחר"
+          },
+          "plain": "נתראה מחר"
+        }
+      ]
+    },
+    {
+      "id": "school",
+      "titles": {
+        "en": "School and ulpan",
+        "ru": "Школа и ульпан",
+        "uk": "Школа й ульпан",
+        "fr": "École et oulpan",
+        "es": "Escuela y ulpán",
+        "pt": "Escola e ulpan",
+        "ar": "المدرسة والأولبان",
+        "am": "ትምህርት ቤትና ኡልፓን",
+        "de": "Schule und Ulpan",
+        "he": "בית ספר ואולפן"
+      },
+      "phrases": [
+        {
+          "id": "school-1",
+          "he": "שִׁעוּר",
+          "translit": "shiur",
+          "meanings": {
+            "en": "Lesson",
+            "ru": "Урок",
+            "uk": "Урок",
+            "fr": "Cours",
+            "es": "Clase",
+            "pt": "Aula",
+            "ar": "درس",
+            "am": "ትምህርት",
+            "de": "Unterricht",
+            "he": "שיעור"
+          },
+          "plain": "שיעור"
+        },
+        {
+          "id": "school-2",
+          "he": "מוֹרֶה",
+          "translit": "more",
+          "meanings": {
+            "en": "Teacher",
+            "ru": "Учитель / учительница",
+            "uk": "Учитель / учителька",
+            "fr": "Enseignant/e",
+            "es": "Profesor/a",
+            "pt": "Professor/a",
+            "ar": "معلّم / معلّمة",
+            "am": "መምህር / መምህርት",
+            "de": "Lehrer / Lehrerin",
+            "he": "מורה"
+          },
+          "female": "מוֹרָה",
+          "femaleTranslit": "mora",
+          "plain": "מורה",
+          "femalePlain": "מורה"
+        },
+        {
+          "id": "school-3",
+          "he": "מַחְבֶּרֶת",
+          "translit": "machberet",
+          "meanings": {
+            "en": "Notebook",
+            "ru": "Тетрадь",
+            "uk": "Зошит",
+            "fr": "Cahier",
+            "es": "Cuaderno",
+            "pt": "Caderno",
+            "ar": "دفتر",
+            "am": "ደብተር",
+            "de": "Heft",
+            "he": "מחברת"
+          },
+          "plain": "מחברת"
+        },
+        {
+          "id": "school-4",
+          "he": "יֵשׁ לִי שְׁאֵלָה",
+          "translit": "yesh li sheela",
+          "meanings": {
+            "en": "I have a question",
+            "ru": "У меня вопрос",
+            "uk": "У мене запитання",
+            "fr": "J'ai une question",
+            "es": "Tengo una pregunta",
+            "pt": "Tenho uma pergunta",
+            "ar": "لديّ سؤال",
+            "am": "ጥያቄ አለኝ",
+            "de": "Ich habe eine Frage",
+            "he": "יש לי שאלה"
+          },
+          "plain": "יש לי שאלה"
+        },
+        {
+          "id": "school-5",
+          "he": "אֵיפֹה הַכִּתָּה?",
+          "translit": "eifo hakita?",
+          "meanings": {
+            "en": "Where is the classroom?",
+            "ru": "Где класс?",
+            "uk": "Де клас?",
+            "fr": "Où est la salle de classe ?",
+            "es": "¿Dónde está el aula?",
+            "pt": "Onde fica a sala de aula?",
+            "ar": "أين غرفة الصف؟",
+            "am": "የመማሪያ ክፍሉ የት ነው?",
+            "de": "Wo ist der Klassenraum?",
+            "he": "איפה הכיתה?"
+          },
+          "plain": "איפה הכיתה?"
+        },
+        {
+          "id": "school-6",
+          "he": "אֶפְשָׁר דֻּגְמָה?",
+          "translit": "efshar dugma?",
+          "meanings": {
+            "en": "Could I have an example?",
+            "ru": "Можно пример?",
+            "uk": "Можна приклад?",
+            "fr": "Pouvez-vous donner un exemple ?",
+            "es": "¿Puede dar un ejemplo?",
+            "pt": "Pode dar um exemplo?",
+            "ar": "هل يمكن إعطاء مثال؟",
+            "am": "ምሳሌ መስጠት ይችላሉ?",
+            "de": "Können Sie ein Beispiel geben?",
+            "he": "אפשר דוגמה?"
+          },
+          "plain": "אפשר דוגמה?"
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "titles": {
+        "en": "Everyday errands",
+        "ru": "Повседневные дела",
+        "uk": "Повсякденні справи",
+        "fr": "Démarches du quotidien",
+        "es": "Gestiones diarias",
+        "pt": "Tarefas do dia a dia",
+        "ar": "المعاملات اليومية",
+        "am": "የዕለት ተዕለት ጉዳዮች",
+        "de": "Alltägliche Erledigungen",
+        "he": "סידורים יומיומיים"
+      },
+      "phrases": [
+        {
+          "id": "services-1",
+          "he": "תְּעוּדַת זֶהוּת",
+          "translit": "teudat zehut",
+          "meanings": {
+            "en": "Identity card",
+            "ru": "Удостоверение личности",
+            "uk": "Посвідчення особи",
+            "fr": "Carte d'identité",
+            "es": "Documento de identidad",
+            "pt": "Documento de identidade",
+            "ar": "بطاقة هوية",
+            "am": "መታወቂያ",
+            "de": "Personalausweis",
+            "he": "תעודת זהות"
+          },
+          "plain": "תעודת זהות"
+        },
+        {
+          "id": "services-2",
+          "he": "טֹפֶס",
+          "translit": "tofes",
+          "meanings": {
+            "en": "Form (document)",
+            "ru": "Бланк",
+            "uk": "Бланк",
+            "fr": "Formulaire",
+            "es": "Formulario",
+            "pt": "Formulário",
+            "ar": "استمارة",
+            "am": "ቅጽ",
+            "de": "Formular",
+            "he": "טופס"
+          },
+          "plain": "טופס"
+        },
+        {
+          "id": "services-3",
+          "he": "חֲתִימָה",
+          "translit": "chatima",
+          "meanings": {
+            "en": "Signature",
+            "ru": "Подпись",
+            "uk": "Підпис",
+            "fr": "Signature",
+            "es": "Firma",
+            "pt": "Assinatura",
+            "ar": "توقيع",
+            "am": "ፊርማ",
+            "de": "Unterschrift",
+            "he": "חתימה"
+          },
+          "plain": "חתימה"
+        },
+        {
+          "id": "services-4",
+          "he": "אֵיפֹה חוֹתְמִים?",
+          "translit": "eifo chotmim?",
+          "meanings": {
+            "en": "Where do I sign?",
+            "ru": "Где подписать?",
+            "uk": "Де підписати?",
+            "fr": "Où faut-il signer ?",
+            "es": "¿Dónde firmo?",
+            "pt": "Onde assino?",
+            "ar": "أين أوقّع؟",
+            "am": "የት ልፈርም?",
+            "de": "Wo unterschreibe ich?",
+            "he": "איפה חותמים?"
+          },
+          "plain": "איפה חותמים?"
+        },
+        {
+          "id": "services-5",
+          "he": "אֲנִי צָרִיךְ לִקְבֹּעַ תּוֹר",
+          "translit": "ani tzarich likboa tor",
+          "meanings": {
+            "en": "I need to make an appointment",
+            "ru": "Мне нужно записаться на приём",
+            "uk": "Мені потрібно записатися на прийом",
+            "fr": "Je dois prendre rendez-vous",
+            "es": "Necesito pedir cita",
+            "pt": "Preciso marcar um horário",
+            "ar": "أحتاج إلى حجز موعد",
+            "am": "ቀጠሮ መያዝ አለብኝ",
+            "de": "Ich muss einen Termin vereinbaren",
+            "he": "אני צריך לקבוע תור"
+          },
+          "female": "אֲנִי צְרִיכָה לִקְבֹּעַ תּוֹר",
+          "femaleTranslit": "ani tzricha likboa tor",
+          "plain": "אני צריך לקבוע תור",
+          "femalePlain": "אני צריכה לקבוע תור"
+        },
+        {
+          "id": "services-6",
+          "he": "מָה צָרִיךְ לְהָבִיא?",
+          "translit": "ma tzarich lehavi?",
+          "meanings": {
+            "en": "What do I need to bring?",
+            "ru": "Что нужно принести?",
+            "uk": "Що потрібно принести?",
+            "fr": "Que faut-il apporter ?",
+            "es": "¿Qué tengo que traer?",
+            "pt": "O que preciso trazer?",
+            "ar": "ماذا يجب أن أحضر؟",
+            "am": "ምን ማምጣት አለብኝ?",
+            "de": "Was muss ich mitbringen?",
+            "he": "מה צריך להביא?"
+          },
+          "plain": "מה צריך להביא?"
+        }
+      ]
+    },
+    {
+      "id": "plans",
+      "titles": {
+        "en": "Make plans",
+        "ru": "Строим планы",
+        "uk": "Плануємо",
+        "fr": "Faire des projets",
+        "es": "Hacer planes",
+        "pt": "Fazer planos",
+        "ar": "وضع الخطط",
+        "am": "እቅድ ማውጣት",
+        "de": "Pläne machen",
+        "he": "קובעים תוכניות"
+      },
+      "phrases": [
+        {
+          "id": "plans-1",
+          "he": "אֶפְשָׁר לְהִיפָּגֵשׁ?",
+          "translit": "efshar lehipagesh?",
+          "meanings": {
+            "en": "Can we meet?",
+            "ru": "Можно встретиться?",
+            "uk": "Можемо зустрітися?",
+            "fr": "Peut-on se voir ?",
+            "es": "¿Podemos vernos?",
+            "pt": "Podemos nos encontrar?",
+            "ar": "هل يمكن أن نلتقي؟",
+            "am": "መገናኘት እንችላለን?",
+            "de": "Können wir uns treffen?",
+            "he": "אפשר להיפגש?"
+          },
+          "plain": "אפשר להיפגש?"
+        },
+        {
+          "id": "plans-2",
+          "he": "מָתַי נוֹחַ לְךָ?",
+          "translit": "matai noach lecha?",
+          "meanings": {
+            "en": "When is convenient for you?",
+            "ru": "Когда вам удобно?",
+            "uk": "Коли вам зручно?",
+            "fr": "Quand cela vous convient-il ?",
+            "es": "¿Cuándo te viene bien?",
+            "pt": "Quando é bom para você?",
+            "ar": "متى يناسبك؟",
+            "am": "መቼ ይመችዎታል?",
+            "de": "Wann passt es dir?",
+            "he": "מתי נוח לך?"
+          },
+          "female": "מָתַי נוֹחַ לָךְ?",
+          "femaleTranslit": "matai noach lach?",
+          "plain": "מתי נוח לך?",
+          "femalePlain": "מתי נוח לך?"
+        },
+        {
+          "id": "plans-3",
+          "he": "אֲנִי פָּנוּי הָעֶרֶב",
+          "translit": "ani panui haerev",
+          "meanings": {
+            "en": "I'm free this evening",
+            "ru": "Я свободен/свободна вечером",
+            "uk": "Я вільний/вільна ввечері",
+            "fr": "Je suis libre ce soir",
+            "es": "Estoy libre esta tarde/noche",
+            "pt": "Estou livre esta noite",
+            "ar": "أنا متفرّغ/متفرّغة هذا المساء",
+            "am": "ዛሬ ማታ ነፃ ነኝ",
+            "de": "Ich habe heute Abend Zeit",
+            "he": "אני פנוי הערב"
+          },
+          "female": "אֲנִי פְּנוּיָה הָעֶרֶב",
+          "femaleTranslit": "ani pnuya haerev",
+          "plain": "אני פנוי הערב",
+          "femalePlain": "אני פנויה הערב"
+        },
+        {
+          "id": "plans-4",
+          "he": "רַעְיוֹן טוֹב",
+          "translit": "raayon tov",
+          "meanings": {
+            "en": "Good idea",
+            "ru": "Хорошая идея",
+            "uk": "Гарна ідея",
+            "fr": "Bonne idée",
+            "es": "Buena idea",
+            "pt": "Boa ideia",
+            "ar": "فكرة جيدة",
+            "am": "ጥሩ ሀሳብ",
+            "de": "Gute Idee",
+            "he": "רעיון טוב"
+          },
+          "plain": "רעיון טוב"
+        },
+        {
+          "id": "plans-5",
+          "he": "אוּלַי בְּפַעַם אַחֶרֶת",
+          "translit": "ulai befaam acheret",
+          "meanings": {
+            "en": "Maybe another time",
+            "ru": "Может, в другой раз",
+            "uk": "Може, іншим разом",
+            "fr": "Peut-être une autre fois",
+            "es": "Quizás en otra ocasión",
+            "pt": "Talvez outra vez",
+            "ar": "ربما في مرة أخرى",
+            "am": "ምናልባት ሌላ ጊዜ",
+            "de": "Vielleicht ein anderes Mal",
+            "he": "אולי בפעם אחרת"
+          },
+          "plain": "אולי בפעם אחרת"
+        },
+        {
+          "id": "plans-6",
+          "he": "שַׁבָּת שָׁלוֹם",
+          "translit": "shabat shalom",
+          "meanings": {
+            "en": "Have a peaceful Shabbat",
+            "ru": "Мирной субботы",
+            "uk": "Мирної суботи",
+            "fr": "Bon chabbat",
+            "es": "Buen shabat",
+            "pt": "Bom shabat",
+            "ar": "سبت سلام",
+            "am": "መልካም ሰንበት",
+            "de": "Schabbat Schalom",
+            "he": "שבת שלום"
+          },
+          "plain": "שבת שלום"
+        }
+      ]
+    },
+    {
+      "id": "messages",
+      "titles": {
+        "en": "Calls and messages",
+        "ru": "Звонки и сообщения",
+        "uk": "Дзвінки й повідомлення",
+        "fr": "Appels et messages",
+        "es": "Llamadas y mensajes",
+        "pt": "Ligações e mensagens",
+        "ar": "المكالمات والرسائل",
+        "am": "ጥሪዎችና መልዕክቶች",
+        "de": "Anrufe und Nachrichten",
+        "he": "שיחות והודעות"
+      },
+      "phrases": [
+        {
+          "id": "messages-1",
+          "he": "מִי מְדַבֵּר?",
+          "translit": "mi medaber?",
+          "meanings": {
+            "en": "Who is speaking?",
+            "ru": "Кто говорит?",
+            "uk": "Хто говорить?",
+            "fr": "Qui est à l'appareil ?",
+            "es": "¿Quién habla?",
+            "pt": "Quem está falando?",
+            "ar": "من يتكلّم؟",
+            "am": "ማን እየተናገረ ነው?",
+            "de": "Wer spricht?",
+            "he": "מי מדבר?"
+          },
+          "female": "מִי מְדַבֶּרֶת?",
+          "femaleTranslit": "mi medaberet?",
+          "plain": "מי מדבר?",
+          "femalePlain": "מי מדברת?"
+        },
+        {
+          "id": "messages-2",
+          "he": "אֲנִי לֹא שׁוֹמֵעַ",
+          "translit": "ani lo shomea",
+          "meanings": {
+            "en": "I can't hear",
+            "ru": "Я не слышу",
+            "uk": "Я не чую",
+            "fr": "Je n'entends pas",
+            "es": "No oigo",
+            "pt": "Não estou ouvindo",
+            "ar": "لا أسمع",
+            "am": "አልሰማም",
+            "de": "Ich höre nichts",
+            "he": "אני לא שומע"
+          },
+          "female": "אֲנִי לֹא שׁוֹמַעַת",
+          "femaleTranslit": "ani lo shomaat",
+          "plain": "אני לא שומע",
+          "femalePlain": "אני לא שומעת"
+        },
+        {
+          "id": "messages-3",
+          "he": "אֲנִי אֶחְזֹר אֵלֶיךָ",
+          "translit": "ani echzor elecha",
+          "meanings": {
+            "en": "I'll call you back",
+            "ru": "Я вам перезвоню",
+            "uk": "Я вам передзвоню",
+            "fr": "Je vous rappellerai",
+            "es": "Te devolveré la llamada",
+            "pt": "Vou ligar de volta",
+            "ar": "سأتصل بك لاحقًا",
+            "am": "መልሼ እደውልልዎታለሁ",
+            "de": "Ich rufe zurück",
+            "he": "אני אחזור אליך"
+          },
+          "female": "אֲנִי אֶחְזֹר אֵלַיִךְ",
+          "femaleTranslit": "ani echzor elayich",
+          "plain": "אני אחזור אליך",
+          "femalePlain": "אני אחזור אלייך"
+        },
+        {
+          "id": "messages-4",
+          "he": "אֶפְשָׁר לִשְׁלֹחַ הוֹדָעָה?",
+          "translit": "efshar lishloach hodaa?",
+          "meanings": {
+            "en": "Can I send a message?",
+            "ru": "Можно отправить сообщение?",
+            "uk": "Можна надіслати повідомлення?",
+            "fr": "Puis-je envoyer un message ?",
+            "es": "¿Puedo enviar un mensaje?",
+            "pt": "Posso mandar uma mensagem?",
+            "ar": "هل يمكن إرسال رسالة؟",
+            "am": "መልዕክት መላክ እችላለሁ?",
+            "de": "Kann ich eine Nachricht schicken?",
+            "he": "אפשר לשלוח הודעה?"
+          },
+          "plain": "אפשר לשלוח הודעה?"
+        },
+        {
+          "id": "messages-5",
+          "he": "קִבַּלְתִּי אֶת הַהוֹדָעָה",
+          "translit": "kibalti et hahodaa",
+          "meanings": {
+            "en": "I received the message",
+            "ru": "Я получил/а сообщение",
+            "uk": "Я отримав/ла повідомлення",
+            "fr": "J'ai reçu le message",
+            "es": "Recibí el mensaje",
+            "pt": "Recebi a mensagem",
+            "ar": "استلمت الرسالة",
+            "am": "መልዕክቱ ደርሶኛል",
+            "de": "Ich habe die Nachricht erhalten",
+            "he": "קיבלתי את ההודעה"
+          },
+          "plain": "קיבלתי את ההודעה"
+        },
+        {
+          "id": "messages-6",
+          "he": "תּוֹדָה עַל הָעֶזְרָה",
+          "translit": "toda al haezra",
+          "meanings": {
+            "en": "Thank you for the help",
+            "ru": "Спасибо за помощь",
+            "uk": "Дякую за допомогу",
+            "fr": "Merci pour votre aide",
+            "es": "Gracias por la ayuda",
+            "pt": "Obrigado/a pela ajuda",
+            "ar": "شكرًا على المساعدة",
+            "am": "ስለ እርዳታዎ አመሰግናለሁ",
+            "de": "Danke für die Hilfe",
+            "he": "תודה על העזרה"
+          },
+          "plain": "תודה על העזרה"
+        }
+      ]
+    }
+  ],
+  "alphabet": [
+    {
+      "letter": "א",
+      "name": "אָלֶף",
+      "sound": "∅"
+    },
+    {
+      "letter": "ב",
+      "name": "בֵּית",
+      "sound": "b / v"
+    },
+    {
+      "letter": "ג",
+      "name": "גִּימֶל",
+      "sound": "g"
+    },
+    {
+      "letter": "ד",
+      "name": "דָּלֶת",
+      "sound": "d"
+    },
+    {
+      "letter": "ה",
+      "name": "הֵא",
+      "sound": "h"
+    },
+    {
+      "letter": "ו",
+      "name": "וָו",
+      "sound": "v / o / u"
+    },
+    {
+      "letter": "ז",
+      "name": "זַיִן",
+      "sound": "z"
+    },
+    {
+      "letter": "ח",
+      "name": "חֵית",
+      "sound": "ch"
+    },
+    {
+      "letter": "ט",
+      "name": "טֵית",
+      "sound": "t"
+    },
+    {
+      "letter": "י",
+      "name": "יוֹד",
+      "sound": "y / i"
+    },
+    {
+      "letter": "כ ך",
+      "name": "כָּף",
+      "sound": "k / ch"
+    },
+    {
+      "letter": "ל",
+      "name": "לָמֶד",
+      "sound": "l"
+    },
+    {
+      "letter": "מ ם",
+      "name": "מֵם",
+      "sound": "m"
+    },
+    {
+      "letter": "נ ן",
+      "name": "נוּן",
+      "sound": "n"
+    },
+    {
+      "letter": "ס",
+      "name": "סָמֶךְ",
+      "sound": "s"
+    },
+    {
+      "letter": "ע",
+      "name": "עַיִן",
+      "sound": "∅"
+    },
+    {
+      "letter": "פ ף",
+      "name": "פֵּא",
+      "sound": "p / f"
+    },
+    {
+      "letter": "צ ץ",
+      "name": "צָדִי",
+      "sound": "ts"
+    },
+    {
+      "letter": "ק",
+      "name": "קוֹף",
+      "sound": "k"
+    },
+    {
+      "letter": "ר",
+      "name": "רֵישׁ",
+      "sound": "r"
+    },
+    {
+      "letter": "ש",
+      "name": "שִׁין",
+      "sound": "sh / s"
+    },
+    {
+      "letter": "ת",
+      "name": "תָּו",
+      "sound": "t"
+    }
+  ]
+}
