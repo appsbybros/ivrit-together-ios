@@ -1,7 +1,8 @@
 import Foundation
 
 // Port of Course (Data.kt): course.json and ui.json are the Android files, copied unchanged
-// and read at runtime, so lessons, meanings and interface texts stay identical.
+// and read at runtime, so lessons, meanings and interface texts stay identical. ui-ios.json
+// adds the few texts only the iOS screens use (in all ten languages).
 
 enum CourseError: Error, CustomStringConvertible {
     case missingResource(String)
@@ -18,12 +19,14 @@ final class Course {
     let lessons: [Lesson]
     let phrases: [Phrase]
     let alphabet: [Letter]
-    /// ui.json by language and key, with iOS wording where Android names its own platform.
+    /// ui.json by language and key, with iOS wording where Android names its own platform,
+    /// plus the iOS-only keys of ui-ios.json.
     let interfaceTexts: [String: [String: String]]
 
     init(bundle: Bundle = .main) throws {
         let file = try Course.read(CourseFile.self, named: "course", in: bundle)
         let texts = try Course.read([String: [String: String]].self, named: "ui", in: bundle)
+        let iosTexts = try Course.read([String: [String: String]].self, named: "ui-ios", in: bundle)
         let builtLessons: [Lesson] = file.lessons.map { entry in
             Lesson(id: entry.id, titles: entry.titles, phrases: entry.phrases.map { item in
                 Phrase(id: item.id,
@@ -42,7 +45,8 @@ final class Course {
         alphabet = file.alphabet.map { Letter(letter: $0.letter, name: $0.name, sound: $0.sound) }
         var adapted: [String: [String: String]] = [:]
         for (language, values) in texts {
-            var localized: [String: String] = [:]
+            // The iOS-only texts first, so Android's text wins if ui.json gains the same key.
+            var localized: [String: String] = iosTexts[language] ?? [:]
             for (key, value) in values {
                 localized[key] = PlatformWording.adapt(key: key, value: value)
             }

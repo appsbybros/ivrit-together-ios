@@ -269,45 +269,92 @@ struct Question: Equatable, Sendable {
     let tokenOrder: [Int]
 }
 
+/// A practice session. iOS checks every answer as soon as it is given (owner QA ISSUE-001;
+/// Android checks with a Check button): a chosen option at once, a built sentence when its
+/// last word is placed. A right answer locks the question until Next. A wrong one is marked
+/// without showing the right answer, and the learner may try again or move on with Next.
+/// Only the first check of a question counts: it alone scores, and the view model saves it
+/// alone to the spaced review and the daily goal.
 struct Session: Equatable, Sendable {
     var id: String = UUID().uuidString.lowercased()
     var lessonId: String? = nil
     var questions: [Question]
     var index: Int = 0
+    /// The option chosen last (meaning and listening questions).
     var selection: String? = nil
     var selectedTokens: [Int] = []
-    var checked: Bool = false
+    /// This question's options already chosen and found wrong, in the order they were tried.
+    var wrongChoices: [String] = []
+    /// How many answers to this question have been checked.
+    var tries: Int = 0
+    /// The last checked answer is right: the question is solved and locked until Next.
     var correct: Bool = false
+    /// The last checked answer is wrong and still unchanged (moving a word clears it).
+    var wrong: Bool = false
     var score: Int = 0
 
     var question: Question { questions[index] }
     var attemptId: String { "\(id):\(index)" }
     var isLast: Bool { index == questions.count - 1 }
+    /// The first answer to this question has been checked (and saved), so Next is available.
+    var checked: Bool { tries > 0 }
+    /// Every word of the sentence is in the answer.
+    var sentenceComplete: Bool { selectedTokens.count == question.tokens.count }
 
+    /// Chooses an option and checks it at once. Ignored once the question is solved, for an
+    /// option already found wrong, for an id that is not one of the choices, and in a
+    /// sentence question.
+    func choose(_ choice: String) -> Session {
+        if correct || question.kind == .build || wrongChoices.contains(choice) { return self }
+        if !question.choices.contains(where: { $0.id == choice }) { return self }
+        var updated = self
+        updated.selection = choice
+        return updated.submit()
+    }
+
+    /// Puts a word into the answer, or a chosen word back into the word bank. Placing the
+    /// last word checks the sentence at once; after a wrong sentence the words can be moved
+    /// and the sentence built again. A solved sentence is locked.
     func toggleToken(_ token: Int) -> Session {
-        if checked || !question.tokens.indices.contains(token) { return self }
+        if correct || question.kind != .build || !question.tokens.indices.contains(token) { return self }
         var updated = self
         if let position = selectedTokens.firstIndex(of: token) {
             updated.selectedTokens.remove(at: position)
         } else {
             updated.selectedTokens.append(token)
         }
+        updated.wrong = false
+        if updated.sentenceComplete {
+            return updated.submit()
+        }
         return updated
     }
 
+    /// Checks the current answer: the chosen option, or the sentence once all its words are
+    /// placed. Nothing is checked twice: a solved question, an option already found wrong and
+    /// a wrong sentence that has not been changed are ignored. Only a right first check
+    /// scores.
     func submit() -> Session {
-        if checked { return self }
+        if correct { return self }
         let current = question
+        var updated = self
         let ok: Bool
         if current.kind == .build {
+            if wrong || !sentenceComplete { return self }
             ok = selectedTokens.map { current.tokens[$0] } == current.tokens
         } else {
-            ok = selection == current.phrase.id
+            guard let chosen = selection, !wrongChoices.contains(chosen) else { return self }
+            ok = chosen == current.phrase.id
+            if !ok {
+                updated.wrongChoices.append(chosen)
+            }
         }
-        var updated = self
-        updated.checked = true
+        updated.tries = tries + 1
         updated.correct = ok
-        updated.score = score + (ok ? 1 : 0)
+        updated.wrong = !ok
+        if ok && tries == 0 {
+            updated.score = score + 1
+        }
         return updated
     }
 
@@ -316,8 +363,10 @@ struct Session: Equatable, Sendable {
         updated.index = index + 1
         updated.selection = nil
         updated.selectedTokens = []
-        updated.checked = false
+        updated.wrongChoices = []
+        updated.tries = 0
         updated.correct = false
+        updated.wrong = false
         return updated
     }
 }

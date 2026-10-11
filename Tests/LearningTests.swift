@@ -59,10 +59,21 @@ final class LearningTests: XCTestCase {
     func testRepeatedWordsRemainSeparateTokens() {
         let p = Phrase(id: "p", lessonId: "l", hebrew: "טוב טוב", transliteration: "tov tov", meanings: ["en": "very good"])
         let q = Question(phrase: p, kind: .build, choices: [p], tokens: ["טוב", "טוב"], tokenOrder: [1, 0])
-        var s = Session(questions: [q])
-        s = s.toggleToken(1).toggleToken(0)
-        XCTAssertTrue(s.submit().correct)
-        XCTAssertEqual(s.toggleToken(1).selectedTokens, [0])
+        // The Kotlin assertion, on an answer [1, 0] that is not checked yet: removing token 1
+        // returns only that word, not the equal word at index 0.
+        var unchecked = Session(questions: [q])
+        unchecked.selectedTokens = [1, 0]
+        XCTAssertEqual(unchecked.toggleToken(1).selectedTokens, [0])
+        // iOS checks the sentence as soon as its last word is placed (Android on Check), so in
+        // the tapped flow a word is removed before the sentence is complete.
+        let s = Session(questions: [q]).toggleToken(1)
+        XCTAssertEqual(s.selectedTokens, [1], "Only the tapped word moves, not every equal word")
+        XCTAssertEqual(s.toggleToken(1).selectedTokens, [], "Tapping a chosen word returns just that word")
+        XCTAssertFalse(s.checked)
+        let built = s.toggleToken(0)
+        XCTAssertEqual(built.selectedTokens, [1, 0])
+        XCTAssertTrue(built.correct, "Equal words may stand in either order")
+        XCTAssertTrue(built.submit().correct)
     }
 
     func testSessionContainsOnlyDistinctAnswers() {
@@ -159,5 +170,89 @@ final class LearningTests: XCTestCase {
         XCTAssertTrue(containsIgnoringCase("Доброе утро", "УТРО"))
         XCTAssertTrue(containsIgnoringCase("anything", ""))
         XCTAssertFalse(containsIgnoringCase("shalom", "boker"))
+    }
+
+    // The iOS answer flow (owner QA ISSUE-001): checked on the tap, retry after a wrong answer,
+    // Next manual, and only the first check scores.
+
+    private func choiceSession() -> Session {
+        let ps = (0...3).map { index in
+            Phrase(id: "\(index)", lessonId: "l", hebrew: "מילה \(index)", transliteration: "", meanings: ["en": "meaning \(index)"])
+        }
+        let q = Question(phrase: ps[0], kind: .meaning, choices: ps, tokens: ["מילה", "0"], tokenOrder: [1, 0])
+        return Session(questions: [q, q])
+    }
+
+    func testChoosingAnOptionChecksItAtOnce() {
+        let fresh = choiceSession()
+        XCTAssertFalse(fresh.checked)
+        XCTAssertEqual(fresh.submit(), fresh, "Nothing is checked before an option is chosen")
+        let s = fresh.choose("0")
+        XCTAssertTrue(s.checked)
+        XCTAssertTrue(s.correct)
+        XCTAssertFalse(s.wrong)
+        XCTAssertEqual(s.selection, "0")
+        XCTAssertEqual(s.tries, 1)
+        XCTAssertEqual(s.score, 1)
+        XCTAssertEqual(s.index, 0, "A right answer waits for Next")
+        XCTAssertEqual(s.choose("1"), s, "A solved question is locked until Next")
+        XCTAssertEqual(s.toggleToken(0), s, "Words belong to sentence questions only")
+        let next = s.next()
+        XCTAssertEqual(next.index, 1)
+        XCTAssertFalse(next.checked)
+        XCTAssertFalse(next.correct)
+        XCTAssertNil(next.selection)
+        XCTAssertEqual(next.tries, 0)
+        XCTAssertEqual(next.score, 1)
+    }
+
+    func testWrongChoiceIsMarkedAndOnlyTheFirstTryScores() {
+        var s = choiceSession().choose("2")
+        XCTAssertTrue(s.checked)
+        XCTAssertTrue(s.wrong)
+        XCTAssertFalse(s.correct)
+        XCTAssertEqual(s.wrongChoices, ["2"])
+        XCTAssertEqual(s.score, 0)
+        XCTAssertEqual(s.choose("2"), s, "An option found wrong is not checked again")
+        XCTAssertEqual(s.choose("9"), s, "Only the question's options can be chosen")
+        s = s.choose("3")
+        XCTAssertEqual(s.wrongChoices, ["2", "3"])
+        XCTAssertEqual(s.tries, 2)
+        XCTAssertTrue(s.wrong)
+        s = s.choose("0")
+        XCTAssertTrue(s.correct)
+        XCTAssertFalse(s.wrong)
+        XCTAssertEqual(s.tries, 3)
+        XCTAssertEqual(s.score, 0, "Only a right first answer scores")
+        XCTAssertEqual(s.wrongChoices, ["2", "3"], "Options found wrong stay marked")
+        let next = s.next()
+        XCTAssertTrue(next.wrongChoices.isEmpty)
+        XCTAssertFalse(next.wrong)
+        XCTAssertEqual(next.choose("0").score, 1)
+    }
+
+    func testSentenceIsCheckedWhenItsLastWordIsPlacedAndCanBeFixed() {
+        let p = Phrase(id: "p", lessonId: "l", hebrew: "אני לומד עברית", transliteration: "", meanings: ["en": "I learn Hebrew"])
+        let q = Question(phrase: p, kind: .build, choices: [p], tokens: ["אני", "לומד", "עברית"], tokenOrder: [2, 0, 1])
+        var s = Session(questions: [q]).toggleToken(1).toggleToken(0)
+        XCTAssertFalse(s.checked, "An unfinished sentence is not checked")
+        XCTAssertEqual(s.submit(), s)
+        XCTAssertEqual(s.choose("p"), s, "A sentence question has no options to choose")
+        s = s.toggleToken(2)
+        XCTAssertEqual(s.selectedTokens, [1, 0, 2])
+        XCTAssertTrue(s.checked)
+        XCTAssertTrue(s.wrong)
+        XCTAssertFalse(s.correct)
+        XCTAssertEqual(s.tries, 1)
+        XCTAssertEqual(s.submit(), s, "An unchanged wrong sentence is not checked again")
+        s = s.toggleToken(1).toggleToken(2)
+        XCTAssertEqual(s.selectedTokens, [0])
+        XCTAssertFalse(s.wrong, "Moving a word clears the wrong mark")
+        XCTAssertEqual(s.tries, 1)
+        s = s.toggleToken(1).toggleToken(2)
+        XCTAssertTrue(s.correct)
+        XCTAssertEqual(s.tries, 2)
+        XCTAssertEqual(s.score, 0, "A sentence fixed on a retry does not score")
+        XCTAssertEqual(s.toggleToken(0), s, "A solved sentence is locked")
     }
 }

@@ -5,14 +5,19 @@ the Android app (`C:/Projects/IvritTogether`, Kotlin and Jetpack Compose, versio
 Bundle ID `com.appsbybros.ivrittogether`, version 1.0.0, iOS 17 or later, iPhone and iPad,
 portrait and landscape.
 
-**Status: written without a Swift compiler and not compiled yet.** See
-[BUILD_STATUS.md](BUILD_STATUS.md) for what was checked and what has to happen next.
+**Status:** version 1.0.0 builds and runs: the owner reports every build green and tested the
+TestFlight build on an iPad. The practice change for the owner's QA report (ISSUE-001,
+answers checked on the tap) was written without a Swift compiler and **is not compiled yet**.
+See [BUILD_STATUS.md](BUILD_STATUS.md) for what was checked and what has to happen next.
 
 ## What the app does
 
 - 18 everyday topics, 108 words and phrases, 22 letters with the five final forms.
 - Learning cards, meaning and listening questions, right-to-left sentence construction,
   matching, a searchable phrasebook with saved phrases, and spaced review.
+- Practice checks each answer as soon as it is tapped (a sentence when its last word is
+  placed). A wrong answer is marked without revealing the right one and can be corrected;
+  the learner moves on with Next.
 - Interface and meanings in English, Russian, Ukrainian, French, Spanish, Portuguese,
   Arabic, Amharic, German and Hebrew, with right-to-left layout for Arabic and Hebrew and
   no English fallback.
@@ -30,6 +35,9 @@ portrait and landscape.
 `Resources/course.json` and `Resources/ui.json` are byte-identical copies of the Android
 `app/src/main/assets` files (SHA-256 `b840a6fb…ab26953` and `7549cd5d…c3dba1a`) and are read
 at runtime. To update content, copy the Android files again; nothing else needs to change.
+`Resources/ui-ios.json` adds the two texts only the iOS practice screen uses (`try_again`,
+`incorrect`, in all ten languages); they are merged at load, and if Android's `ui.json` ever
+gains the same key, Android's text is used (a unit test then asks to remove the iOS copy).
 
 The Swift code ports every rule of `Learning.kt`, `Data.kt`, `LearnViewModel.kt`,
 `Speech.kt` and `MainActivity.kt`:
@@ -47,10 +55,24 @@ Spaced review keeps Android's intervals (20 minutes, 1, 3, 7, 14 and 30 days), e
 repeats do not advance a stage, a wrong answer resets it, repeated taps on the same answer
 count once, the daily goal counts five different correctly answered phrases per day, the
 last 60 days and 600 attempt ids are kept, and unreadable saved progress is preserved
-(saving is refused) until the learner resets it.
+(saving is refused) until the learner resets it. With iOS's retry after a wrong answer
+(below), only the first answer to each question is saved: it alone decides the score, the
+spaced review and the daily goal, so a phrase found on a later try counts as not known yet.
 
 ### Deliberate iOS differences
 
+- **Practice answers** (owner QA report ISSUE-001, 11 October 2026; Android still has a
+  Check button). A tap on an option checks it at once. A right option is marked ✓, "That's
+  right" shows the Hebrew and its meaning, and **Next** (Finish on the last question) moves on
+  only when the learner taps it. A wrong option is marked ✗ and cannot be chosen again; "Not
+  quite. Try again." is shown, the right answer is not revealed, the other options stay
+  available, and a secondary Next lets the learner move on, as Minik offers Next after a
+  wrong attempt. A sentence is checked as soon as its last word is placed; a wrong sentence
+  keeps its words where they were put (it is not corrected), tapping a placed word returns it
+  to the bank, and the rebuilt sentence is checked again. A listening question shows its
+  Hebrew text on request or with the right answer. Matching already checked every pair at
+  once and is unchanged. VoiceOver announces every checked answer (queued after its own
+  speech) and reads each option's mark ("That's right" or "Not correct").
 - **More Minik apps & games** is left out: it uses an Android-only shared module, and the
   developer's App Store page URL is not known yet.
 - **Privacy note**: `ui.json` says "Android backups may include progress" in all ten
@@ -78,6 +100,7 @@ project.yml                 XcodeGen spec: app target IvritTogether, unit tests 
 Sources/                    SwiftUI app (14 files)
 Resources/course.json       identical to Android
 Resources/ui.json           identical to Android
+Resources/ui-ios.json       the iOS-only interface texts, in the same ten languages
 Resources/Assets.xcassets   AppIcon (1024 px, no transparency), Neighborhood art, colours
 Resources/Localization/     InfoPlist.strings for the ten languages
 Resources/PrivacyInfo.xcprivacy  UserDefaults (CA92.1), no tracking, no collected data
@@ -104,12 +127,16 @@ generates the project, compiles the app and its tests for an iPhone simulator, r
 unit tests, compiles Release for devices without signing, and lists every compiler error
 and failed test in the run summary. It needs no secrets.
 
-The unit tests (50) port `LearningTest.kt` and `DailyGoalTest.kt` and the content,
+The unit tests (57) port `LearningTest.kt` and `DailyGoalTest.kt` and the content,
 storage and flow checks of `LearningDeviceTest.kt`: every lesson solvable in both forms
 and all ten languages, every interface key present in all ten languages (including each
-key the iOS screens read), Android-format progress read correctly, corrupt progress kept
-until reset, double submission ignored, matching, unpointed sentence building, daily
-practice and reset.
+key the iOS screens read and the iOS-only texts), Android-format progress read correctly,
+corrupt progress kept until reset, repeated taps ignored, matching, unpointed sentence
+building, daily practice and reset. They also cover the iOS answer flow: checked on the tap
+with no Check button, Next manual and unavailable before an answer, a wrong option marked
+and retried without the answer being shown, Next after a wrong answer, a wrong sentence
+checked when complete and fixed, an answer that cannot be saved not shown as checked, and
+only the first answer counting for the score, the spaced review and the daily goal.
 
 ## TestFlight
 

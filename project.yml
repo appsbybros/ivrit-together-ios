@@ -29,6 +29,9 @@ targets:
         buildPhase: resources
       - path: Resources/ui.json
         buildPhase: resources
+      # Interface texts only the iOS screens use; ui.json stays identical to Android.
+      - path: Resources/ui-ios.json
+        buildPhase: resources
       - path: Resources/Assets.xcassets
       - path: Resources/PrivacyInfo.xcprivacy
         buildPhase: resources

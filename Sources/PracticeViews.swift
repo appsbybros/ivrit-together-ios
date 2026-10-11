@@ -1,7 +1,18 @@
 import SwiftUI
 import UIKit
 
-// Port of Practice, Token, ResultPage and MatchPage (MainActivity.kt).
+// Port of Practice, Token, ResultPage and MatchPage (MainActivity.kt). Unlike Android, an
+// answer is checked as soon as it is tapped, with no Check button (owner QA ISSUE-001): a wrong
+// answer is marked without showing the right one and can be corrected, and Next stays manual.
+
+/// A VoiceOver announcement, queued after what VoiceOver is saying (such as the tapped
+/// option's new state) so that it is not cut off; Android uses a polite live region.
+@MainActor
+func announceForVoiceOver(_ text: String) {
+    let announcement = NSAttributedString(string: text,
+                                          attributes: [.accessibilitySpeechQueueAnnouncement: true])
+    UIAccessibility.post(notification: .announcement, argument: announcement)
+}
 
 struct PracticeView: View {
     @EnvironmentObject private var vm: LearnViewModel
@@ -26,28 +37,32 @@ struct PracticeView: View {
                 if question.kind == .build {
                     buildArea(session: session, question: question)
                 } else {
+                    // A tap checks the option at once. An option found wrong keeps its mark and
+                    // cannot be chosen again; the others stay open until the right one is found.
                     ForEach(question.choices) { choice in
+                        let mark = PracticeView.mark(session, choice.id)
                         ChoiceButton(text: choice.meaning(vm.language),
-                                     chosen: session.selection == choice.id,
-                                     enabled: !session.checked,
+                                     mark: mark,
+                                     markDescription: markDescription(mark),
+                                     enabled: !session.correct && mark != .wrong,
                                      identifier: "choice-\(choice.id)") {
                             vm.select(choice.id)
                         }
                     }
                 }
-                if session.checked {
+                if session.correct || session.wrong {
                     feedback(session: session, question: question)
-                    ActionButton(title: vm.t(session.isLast ? "finish" : "continue"),
+                }
+                // Next stays manual, as in Minik: after the right answer, or after a wrong one
+                // to move on without being shown the answer (then in the secondary style, so
+                // trying again stays the obvious step).
+                if session.checked {
+                    ActionButton(title: vm.t(session.isLast ? "finish" : "next"),
                                  identifier: "next-question",
-                                 enabled: !vm.busy) {
+                                 enabled: !vm.busy,
+                                 secondary: !session.correct) {
                         speech.stop()
                         vm.next()
-                    }
-                } else {
-                    ActionButton(title: vm.t("check"),
-                                 identifier: "check",
-                                 enabled: !vm.busy && (session.selection != nil || !session.selectedTokens.isEmpty)) {
-                        vm.submit()
                     }
                 }
             }
@@ -56,11 +71,11 @@ struct PracticeView: View {
             .onAppear { playListeningQuestion() }
             .onChange(of: session.attemptId) { _, _ in playListeningQuestion() }
             .onChange(of: speech.ready) { _, _ in playListeningQuestion() }
-            // Android's live region on the feedback text.
-            .onChange(of: session.checked) { _, checked in
-                if checked {
-                    UIAccessibility.post(notification: .announcement,
-                                         argument: vm.t(vm.session?.correct == true ? "correct" : "not_yet"))
+            // Android's live region on the feedback text: every checked answer is announced,
+            // including each new try after a wrong one.
+            .onChange(of: session.tries) { _, tries in
+                if tries > 0 {
+                    announceForVoiceOver(vm.t(vm.session?.correct == true ? "correct" : "try_again"))
                 }
             }
         }
@@ -71,6 +86,22 @@ struct PracticeView: View {
         case .meaning: return "choose_meaning"
         case .listen: return "listen_choose"
         case .build: return "build"
+        }
+    }
+
+    /// Options found wrong keep their mark; the right one is marked once it is chosen.
+    static func mark(_ session: Session, _ choice: String) -> ChoiceMark {
+        if session.wrongChoices.contains(choice) { return .wrong }
+        if session.correct && session.selection == choice { return .right }
+        return .unmarked
+    }
+
+    /// What VoiceOver says about a marked option.
+    private func markDescription(_ mark: ChoiceMark) -> String {
+        switch mark {
+        case .unmarked: return ""
+        case .right: return vm.t("correct")
+        case .wrong: return vm.t("incorrect")
         }
     }
 
@@ -109,7 +140,8 @@ struct PracticeView: View {
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("show-text")
-            if shownTextFor == session.attemptId || session.checked {
+            // Shown on request, or with the right answer; a wrong try leaves listening open.
+            if shownTextFor == session.attemptId || session.correct {
                 HebrewText(text: vm.hebrew(question.phrase), size: 32)
             }
         case .build:
@@ -118,7 +150,9 @@ struct PracticeView: View {
     }
 
     /// Right-to-left sentence construction: the answer row and the word bank both fill from
-    /// the right, as Android forces LayoutDirection.Rtl here.
+    /// the right, as Android forces LayoutDirection.Rtl here. The sentence is checked when its
+    /// last word is placed. A wrong sentence is marked (not corrected) and its words stay
+    /// movable, so it can be fixed; a right one is locked until Next.
     @ViewBuilder
     private func buildArea(session: Session, question: Question) -> some View {
         BodyText(text: vm.t("build_hint"), size: 16, color: Palette.muted)
@@ -127,16 +161,17 @@ struct PracticeView: View {
             ForEach(session.selectedTokens, id: \.self) { index in
                 TokenButton(text: tokenText(question, index),
                             identifier: "chosen-\(index)",
-                            enabled: !session.checked) {
+                            enabled: !session.correct) {
                     vm.token(index)
                 }
             }
         }
         .padding(12)
         .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
+        .background(answerFill(session), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .strokeBorder(Palette.teal.opacity(0.3), lineWidth: 2)
+                .strokeBorder(answerBorder(session), lineWidth: 2)
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel(vm.t("your_answer"))
@@ -145,11 +180,25 @@ struct PracticeView: View {
             ForEach(question.tokenOrder.filter { !session.selectedTokens.contains($0) }, id: \.self) { index in
                 TokenButton(text: tokenText(question, index),
                             identifier: "token-\(index)",
-                            enabled: !session.checked) {
+                            enabled: !session.correct) {
                     vm.token(index)
                 }
             }
         }
+    }
+
+    /// The answer row is marked like an option: mint when right, the retry colour while a
+    /// wrong sentence is unchanged.
+    private func answerFill(_ session: Session) -> Color {
+        if session.correct { return Palette.mint }
+        if session.wrong { return Palette.retry }
+        return Color.clear
+    }
+
+    private func answerBorder(_ session: Session) -> Color {
+        if session.correct { return Palette.teal }
+        if session.wrong { return Palette.danger }
+        return Palette.teal.opacity(0.3)
     }
 
     /// With vowel marks off, a word shows its everyday unpointed spelling (Android splits the
@@ -161,28 +210,45 @@ struct PracticeView: View {
         return plain.indices.contains(index) ? String(plain[index]) : question.tokens[index]
     }
 
+    /// The right answer with its Hebrew and meaning, or, after a wrong answer, only the
+    /// invitation to try again: the right answer is not revealed.
     @ViewBuilder
     private func feedback(session: Session, question: Question) -> some View {
-        CardPanel(color: session.correct ? Palette.mint : Palette.retry) {
-            BodyText(text: (session.correct ? "✓ " : "↺ ") + vm.t(session.correct ? "correct" : "not_yet"),
-                     size: 23, weight: .bold)
-                .accessibilityIdentifier("feedback")
-            HebrewText(text: vm.hebrew(question.phrase), size: 29)
-            BodyText(text: question.phrase.meaning(vm.language))
+        if session.correct {
+            CardPanel(color: Palette.mint) {
+                BodyText(text: "✓ " + vm.t("correct"), size: 23, weight: .bold)
+                    .accessibilityIdentifier("feedback")
+                HebrewText(text: vm.hebrew(question.phrase), size: 29)
+                BodyText(text: question.phrase.meaning(vm.language))
+            }
+        } else {
+            CardPanel(color: Palette.retry) {
+                BodyText(text: "↺ " + vm.t("try_again"), size: 23, weight: .bold)
+                    .accessibilityIdentifier("feedback")
+            }
         }
     }
 }
 
+/// How a checked option is shown.
+enum ChoiceMark: Equatable {
+    case unmarked
+    case right
+    case wrong
+}
+
 struct ChoiceButton: View {
     let text: String
-    let chosen: Bool
+    let mark: ChoiceMark
+    /// What VoiceOver says about the mark ("That’s right", "Not correct"); empty if unmarked.
+    let markDescription: String
     let enabled: Bool
     let identifier: String
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Text((chosen ? "✓  " : "") + text)
+            Text(markSymbol + text)
                 .appFont(19)
                 .foregroundStyle(Palette.ink)
                 .multilineTextAlignment(.leading)
@@ -191,18 +257,55 @@ struct ChoiceButton: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 14)
                 .frame(minHeight: 60)
-                .background(chosen ? Palette.mint : Color.white,
-                            in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .background(fillColor, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 20, style: .continuous)
-                        .strokeBorder(chosen ? Palette.teal : Palette.ink.opacity(0.16), lineWidth: chosen ? 2 : 1)
+                        .strokeBorder(borderColor, lineWidth: mark == .unmarked ? 1 : 2)
                 )
                 .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                // Once the right answer is found the other options fade; marked ones keep
+                // their colours.
+                .opacity(mark == .unmarked && !enabled ? 0.55 : 1)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChoiceStyle())
         .disabled(!enabled)
-        .accessibilityAddTraits(chosen ? .isSelected : [])
+        .accessibilityLabel(text)
+        .accessibilityValue(markDescription)
+        .accessibilityAddTraits(mark == .right ? .isSelected : [])
         .accessibilityIdentifier(identifier)
+    }
+
+    private var markSymbol: String {
+        switch mark {
+        case .unmarked: return ""
+        case .right: return "✓  "
+        case .wrong: return "✗  "
+        }
+    }
+
+    private var fillColor: Color {
+        switch mark {
+        case .unmarked: return Color.white
+        case .right: return Palette.mint
+        case .wrong: return Palette.retry
+        }
+    }
+
+    private var borderColor: Color {
+        switch mark {
+        case .unmarked: return Palette.ink.opacity(0.16)
+        case .right: return Palette.teal
+        case .wrong: return Palette.danger
+        }
+    }
+}
+
+/// Shows the press only. Unlike the plain style, a disabled option is not dimmed, so a
+/// checked option keeps the colours of its mark.
+private struct ChoiceStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
 
@@ -291,7 +394,7 @@ struct MatchView: View {
             // Android's live region on the "not this pair" text.
             .onChange(of: match.miss) { _, miss in
                 if miss {
-                    UIAccessibility.post(notification: .announcement, argument: vm.t("match_miss"))
+                    announceForVoiceOver(vm.t("match_miss"))
                 }
             }
         }

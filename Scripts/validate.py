@@ -4,7 +4,10 @@ only; it is not a Swift build (the verify workflow compiles and tests on a Mac).
 - course.json: 18 lessons of 6 phrases, 108 phrases, 22 letters, every meaning and title in
   all ten languages.
 - ui.json: the same keys in all ten languages, none empty, and every key the Swift screens
-  read (t("..."), text("..."), error = "...", the navigation and exercise keys) exists.
+  read (t("..."), text("..."), error = "...", the navigation and exercise keys) exists in it
+  or in ui-ios.json.
+- ui-ios.json (texts only the iOS screens use; ui.json stays identical to Android): the same
+  keys in all ten languages, none empty, none repeating a ui.json key, bundled by project.yml.
 - AppIcon 1024 x 1024 PNG without transparency; asset catalog and privacy manifest parse;
   one InfoPlist.strings per language listed in project.yml.
 - App Store texts within Apple's limits (name and subtitle 30, keywords 100, description 4000,
@@ -86,9 +89,20 @@ for code in LANGUAGES:
     check(not missing, f"ui.json {code} misses {missing}")
     empty = sorted(key for key, value in values.items() if not value.strip())
     check(not empty, f"ui.json {code} has empty {empty}")
+ui_ios = json.loads((ROOT / "Resources/ui-ios.json").read_text(encoding="utf-8"))
+check(sorted(ui_ios) == sorted(LANGUAGES), f"ui-ios.json languages: {sorted(ui_ios)}")
+ios_keys = set().union(*(set(values) for values in ui_ios.values()))
+for code in LANGUAGES:
+    values = ui_ios.get(code, {})
+    missing = sorted(ios_keys - set(values))
+    check(not missing, f"ui-ios.json {code} misses {missing}")
+    empty = sorted(key for key, value in values.items() if not value.strip())
+    check(not empty, f"ui-ios.json {code} has empty {empty}")
+repeated = sorted(ios_keys & all_keys)
+check(not repeated, f"ui-ios.json repeats ui.json keys (Android's text wins; remove them): {repeated}")
 used = swift_keys()
-unknown = sorted(key for key in used if key not in all_keys)
-check(not unknown, f"Swift reads keys that ui.json lacks: {unknown}")
+unknown = sorted(key for key in used if key not in all_keys and key not in ios_keys)
+check(not unknown, f"Swift reads keys that ui.json and ui-ios.json lack: {unknown}")
 
 assets = ROOT / "Resources/Assets.xcassets"
 for contents in assets.rglob("Contents.json"):
@@ -106,6 +120,9 @@ for name in ("LaunchBackground", "AccentColor"):
 plistlib.loads((ROOT / "Resources/PrivacyInfo.xcprivacy").read_bytes())
 
 project = (ROOT / "project.yml").read_text(encoding="utf-8")
+for resource in ("course.json", "ui.json", "ui-ios.json"):
+    check(f"- path: Resources/{resource}\n        buildPhase: resources" in project,
+          f"project.yml does not bundle Resources/{resource}")
 listed = re.search(r"CFBundleLocalizations: \[([^\]]+)\]", project)
 check(listed is not None and [item.strip() for item in listed.group(1).split(",")] == LANGUAGES,
       "CFBundleLocalizations in project.yml differs from the ten languages")
@@ -135,6 +152,7 @@ if problems:
     sys.exit(1)
 print(json.dumps({
     "lessons": len(lessons), "phrases": len(phrases), "letters": len(course["alphabet"]),
-    "interfaceKeys": len(all_keys), "keysReadBySwift": len(used), "storeTextLengths": lengths,
+    "interfaceKeys": len(all_keys), "iosOnlyInterfaceKeys": len(ios_keys), "keysReadBySwift": len(used),
+    "storeTextLengths": lengths,
     "swiftCompilation": "not performed by this script",
 }, ensure_ascii=False, indent=1))

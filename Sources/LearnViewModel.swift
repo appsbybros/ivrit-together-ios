@@ -109,34 +109,21 @@ final class LearnViewModel: ObservableObject {
         begin(lessonId)
     }
 
+    /// Choosing an option checks it at once; there is no Check button (Session.choose).
     func select(_ id: String) {
-        guard var current = session, !current.checked else { return }
-        current.selection = id
-        session = current
+        guard let current = session, !busy else { return }
+        show(current.choose(id), replacing: current)
     }
 
+    /// Placing or removing a word; placing the last word checks the sentence at once
+    /// (Session.toggleToken).
     func token(_ index: Int) {
-        guard let current = session else { return }
-        session = current.toggleToken(index)
+        guard let current = session, !busy else { return }
+        show(current.toggleToken(index), replacing: current)
     }
 
-    func submit() {
-        guard let current = session, !current.checked, !busy else { return }
-        if current.question.kind != .build && current.selection == nil { return }
-        if current.question.kind == .build && current.selectedTokens.isEmpty { return }
-        let checked = current.submit()
-        let next = progress.answer(attemptId: current.attemptId,
-                                   phraseId: current.question.phrase.id,
-                                   correct: checked.correct,
-                                   now: currentMillis(),
-                                   date: LocalDay.today())
-        update(next) {
-            if session?.attemptId == current.attemptId {
-                session = checked
-            }
-        }
-    }
-
+    /// Next stays manual: available after the right answer, or after a wrong one to move on
+    /// without being shown the answer.
     func next() {
         guard let current = session, current.checked, !busy else { return }
         if current.isLast {
@@ -217,6 +204,28 @@ final class LearnViewModel: ObservableObject {
             next.right = nil
         }
         match = next
+    }
+
+    /// Shows the session after a tap. The first checked answer of a question is saved before
+    /// it is shown, as Android's submit() does: it alone decides the spaced review and the
+    /// daily goal, so a phrase found only on a later try counts as not known yet. Later tries
+    /// change the screen only. If saving fails, the tap is not applied and the error is shown.
+    private func show(_ updated: Session, replacing current: Session) {
+        if updated == current { return }
+        guard !current.checked && updated.checked else {
+            session = updated
+            return
+        }
+        let next = progress.answer(attemptId: current.attemptId,
+                                   phraseId: current.question.phrase.id,
+                                   correct: updated.correct,
+                                   now: currentMillis(),
+                                   date: LocalDay.today())
+        update(next) {
+            if session?.attemptId == current.attemptId {
+                session = updated
+            }
+        }
     }
 
     @discardableResult

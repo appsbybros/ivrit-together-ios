@@ -1,0 +1,42 @@
+{
+  "en": {
+    "try_again": "Not quite. Try again.",
+    "incorrect": "Not correct"
+  },
+  "ru": {
+    "try_again": "Не совсем. Попробуйте ещё раз.",
+    "incorrect": "Неверно"
+  },
+  "uk": {
+    "try_again": "Не зовсім. Спробуйте ще раз.",
+    "incorrect": "Неправильно"
+  },
+  "fr": {
+    "try_again": "Pas tout à fait. Réessayez.",
+    "incorrect": "Incorrect"
+  },
+  "es": {
+    "try_again": "No exactamente. Inténtalo de nuevo.",
+    "incorrect": "Incorrecto"
+  },
+  "pt": {
+    "try_again": "Não é bem isso. Tente de novo.",
+    "incorrect": "Incorreto"
+  },
+  "ar": {
+    "try_again": "ليس تمامًا. حاول مجددًا.",
+    "incorrect": "غير صحيح"
+  },
+  "am": {
+    "try_again": "ትክክል አይደለም። እንደገና ይሞክሩ።",
+    "incorrect": "ትክክል አይደለም"
+  },
+  "de": {
+    "try_again": "Nicht ganz. Versuche es erneut.",
+    "incorrect": "Falsch"
+  },
+  "he": {
+    "try_again": "לא בדיוק. נסו שוב.",
+    "incorrect": "לא נכון"
+  }
+}
