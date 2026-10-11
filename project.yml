@@ -32,6 +32,9 @@ targets:
       # Interface texts only the iOS screens use; ui.json stays identical to Android.
       - path: Resources/ui-ios.json
         buildPhase: resources
+      # The short chime after a right answer (rendered by Scripts/make_sound.py).
+      - path: Resources/success.wav
+        buildPhase: resources
       - path: Resources/Assets.xcassets
       - path: Resources/PrivacyInfo.xcprivacy
         buildPhase: resources

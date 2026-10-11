@@ -2,12 +2,16 @@ import Combine
 import Foundation
 
 // Port of LearnViewModel.kt. Saving is synchronous on iOS (UserDefaults), so `busy` is only
-// set while a save runs; the same guards still make repeated taps harmless.
+// set while a save runs; the same guards still make repeated taps harmless. Unlike Android, a
+// right answer moves on by itself after its success feedback (owner QA ISSUE-001), and Next is
+// offered only after a wrong answer.
 
 @MainActor
 final class LearnViewModel: ObservableObject {
     let course: Course
     private let store: LocalStore
+    /// VoiceOver's announcements and the pause before a right answer moves on.
+    private let feedback: AnswerFeedback
 
     @Published private(set) var language: String
     @Published private(set) var female: Bool
@@ -24,9 +28,10 @@ final class LearnViewModel: ObservableObject {
     @Published private(set) var match: MatchState? = nil
     @Published private(set) var busy: Bool = false
 
-    init(course: Course, store: LocalStore) {
+    init(course: Course, store: LocalStore, feedback: AnswerFeedback) {
         self.course = course
         self.store = store
+        self.feedback = feedback
         let savedLanguage = store.language
         language = Language.isSupported(savedLanguage) ? savedLanguage : ""
         female = store.female
@@ -45,7 +50,7 @@ final class LearnViewModel: ObservableObject {
         } catch {
             fatalError("The bundled course could not be read: \(error)")
         }
-        self.init(course: course, store: LocalStore())
+        self.init(course: course, store: LocalStore(), feedback: LiveAnswerFeedback())
     }
 
     var isRightToLeft: Bool { Language.isRightToLeft(language) }
@@ -122,10 +127,15 @@ final class LearnViewModel: ObservableObject {
         show(current.toggleToken(index), replacing: current)
     }
 
-    /// Next stays manual: available after the right answer, or after a wrong one to move on
-    /// without being shown the answer.
+    /// Next, offered only after a wrong answer: moves on without revealing the right answer. A
+    /// right answer moves on by itself (moveOn).
     func next() {
-        guard let current = session, current.checked, !busy else { return }
+        guard let current = session, current.offersNext, !busy else { return }
+        advance(from: current)
+    }
+
+    /// The next question, or on the last one the result (saving the lesson as completed).
+    private func advance(from current: Session) {
         if current.isLast {
             var finished = progress
             if let lesson = current.lessonId {
@@ -143,6 +153,7 @@ final class LearnViewModel: ObservableObject {
     }
 
     func abandon() {
+        feedback.cancel()
         session = nil
         match = nil
         result = nil
@@ -213,7 +224,7 @@ final class LearnViewModel: ObservableObject {
     private func show(_ updated: Session, replacing current: Session) {
         if updated == current { return }
         guard !current.checked && updated.checked else {
-            session = updated
+            present(updated, replacing: current)
             return
         }
         let next = progress.answer(attemptId: current.attemptId,
@@ -223,9 +234,30 @@ final class LearnViewModel: ObservableObject {
                                    date: LocalDay.today())
         update(next) {
             if session?.attemptId == current.attemptId {
-                session = updated
+                present(updated, replacing: current)
             }
         }
+    }
+
+    /// Puts the session on screen. Every newly checked answer is announced; a right one then
+    /// moves on by itself after its success feedback, a wrong one waits for another try or Next.
+    private func present(_ updated: Session, replacing current: Session) {
+        session = updated
+        guard updated.tries > current.tries else { return }
+        if updated.correct {
+            let attemptId = updated.attemptId
+            feedback.right(announcement: t("correct")) { [weak self] in
+                self?.moveOn(after: attemptId)
+            }
+        } else {
+            feedback.wrong(announcement: t("try_again"))
+        }
+    }
+
+    /// The move on after a right answer, unless the learner has left the practice meanwhile.
+    private func moveOn(after attemptId: String) {
+        guard let current = session, current.attemptId == attemptId, current.correct else { return }
+        advance(from: current)
     }
 
     @discardableResult

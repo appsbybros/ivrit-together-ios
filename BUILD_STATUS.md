@@ -1,6 +1,6 @@
 # Ivrit Together iOS — build status
 
-Date: 2026-10-11. Version 1.0.0 (build number set by the TestFlight workflow),
+Date: 2026-10-12. Version 1.0.0 (build number set by the TestFlight workflow),
 `com.appsbybros.ivrittogether`, iOS 17+, iPhone and iPad.
 
 ## Current state
@@ -8,10 +8,96 @@ Date: 2026-10-11. Version 1.0.0 (build number set by the TestFlight workflow),
 - **Version 1.0.0 as first committed (`bb4464c`)**: the owner reports that all steps are done
   and all builds are green; the TestFlight build was installed and tested on an iPad (QA
   report of 11 October 2026).
-- **Practice change for QA ISSUE-001 (below)**: written on Windows, where no Swift compiler
-  or Xcode exists. **Not compiled, run or tested yet.**
+- **Practice change for QA ISSUE-001 (`64553ab`) and its follow-up (below, not committed)**:
+  written on Windows, where no Swift compiler or Xcode exists. **Not compiled, run or tested
+  yet.**
+
+## QA ISSUE-001 follow-up: a right answer moves on by itself (not compiled yet)
+
+The owner's spec (12 October 2026): after a right answer, about 1 to 1.5 seconds of pleasant
+success feedback, then the next item by itself, with no Next button; Next appears only after
+a wrong answer; the scoring rules stay as they are.
+
+What changed:
+
+- Right answer (an option, or a sentence when its last word is placed): the option or the
+  answer row turns green (`Palette.correct` #2E7D4A border, `Palette.correctFill` #DCF2E1)
+  with ✓ (the answer row now has a mark slot leading its words, kept free while unmarked so
+  the words never move) and bounces once (scale 1.05 and back, about half a second); a
+  short two-note chime and a success haptic (`UINotificationFeedbackGenerator`, `.success`)
+  play; after 1.2 seconds (`LiveAnswerFeedback.successSeconds`) the next question follows,
+  or on the last one the result (the lesson is saved as completed, as Finish did). No Next
+  is shown, and Next is refused by the model while a right answer is on screen.
+- The "That's right" panel with the Hebrew and its meaning is no longer shown after a right
+  answer: the success feedback is the green mark, the bounce, the chime and the haptic, as the
+  spec lists them (a listening question still shows its Hebrew text with the right answer).
+- Wrong answer: the option turns red (`Palette.wrongFill` #FBE3E1 with the `danger` #9F3030
+  border) with its ✗, the right answer is not revealed, "Not quite. Try again." is shown, the
+  other options stay available, and a secondary Next (Finish on the last question) is
+  offered (`Session.offersNext`: a wrong answer checked and the question not solved). A
+  wrong sentence turns red with ✗ the same way, keeps its words and offers Next; Next stays while
+  the sentence is being fixed. Finding the right answer afterwards hides Next, plays the
+  success feedback and moves on by itself.
+- Scoring unchanged: only the first answer to a question is saved and scored.
+- VoiceOver: every checked answer is announced as before ("That's right", "Not quite. Try
+  again.", queued after VoiceOver's own speech). After a right answer the next question waits
+  until VoiceOver reports that "That's right" has been spoken
+  (`UIAccessibility.announcementDidFinishNotification`), and at least the 1.2 seconds; if the
+  report never comes it moves on after at most 10 seconds more (checked every 0.1 seconds).
+  Reduce Motion: no bounce; the pause stays.
+- The chime: `Resources/success.wav`, 0.65 seconds, C6 then G6 0.1 seconds later, bell-like
+  (two softer overtones), 44.1 kHz mono 16-bit, peak about -6 dBFS, rendered by
+  `Scripts/make_sound.py` (standard library, same file on every run) and bundled by
+  `project.yml`. `Speech.playSuccess()` plays it with `AVAudioPlayer` through the app's audio
+  session (`.playback`, `.spokenAudio`, `.duckOthers`, which mixes with other apps' audio and
+  lowers it while playing), so it also mixes with the Hebrew speech; the session is ended
+  only when neither the speech nor the chime is playing. The player is not prepared at
+  launch, so starting the app does not lower other audio.
+- Speech stops when the practice ends by itself (`onDisappear`), as the Finish button did;
+  moving to the next question already stopped it.
+- Code: the new `Sources/AnswerFeedback.swift` (the `AnswerFeedback` protocol the model uses,
+  `LiveAnswerFeedback`, and `announceForVoiceOver` moved from the practice screen);
+  `LearnViewModel` (a third init parameter `feedback`; `present` announces and starts the
+  pause; `moveOn` moves on only if the learner is still on that solved question; `abandon`
+  cancels the pause); `Session.offersNext`; `PracticeView` (green and red marks, bounce,
+  chime, haptic, Next only after a wrong answer); `Speech` (the chime); `Palette`;
+  `project.yml`; `Scripts/validate.py` (checks the WAV and that it is bundled).
+- Tests: 66 (was 57). The model tests use an `AnswerFeedback` whose pause the test ends
+  itself: a right answer announced, with no Next and moving on only when the pause ends (also
+  the result after the last question); Next only after a wrong answer, also Finish on the last
+  question; a retry after a wrong answer moving on by itself; a fixed sentence moving on;
+  leaving during the pause; an unsaved answer neither announced nor moved on. New
+  `Tests/AnswerFeedbackTests.swift` runs `LiveAnswerFeedback` on an instant clock (nothing
+  sleeps): the pause between 1 and 1.5 seconds, the wait for VoiceOver's announcement (another
+  announcement does not end it), its 10-second limit, cancelling, and the bundled chime
+  readable and shorter than the pause. `LearningTests` check `offersNext`.
+
+Checked without a compiler:
+
+- All 21 Swift files parse without errors in tree-sitter-swift (Python bindings), and their
+  braces, parentheses and brackets balance (comments and strings excluded).
+- Every changed line was read against the iOS 17 API surface and Swift 5 language mode as
+  Xcode 26 builds it. New APIs: `AVAudioPlayer(contentsOf:)`, `play()`, `currentTime`,
+  `isPlaying` and `AVAudioPlayerDelegate.audioPlayerDidFinishPlaying(_:successfully:)`
+  (a `nonisolated` callback hopping to the main actor, like the speech delegate),
+  `UINotificationFeedbackGenerator` (iOS 10), `UIAccessibility.isVoiceOverRunning`,
+  `announcementDidFinishNotification` with `announcementStringValueUserInfoKey` (iOS 6),
+  `@Environment(\.accessibilityReduceMotion)`, `withAnimation(_:_:)` with
+  `.spring(response:dampingFraction:)`, `scaleEffect(_:)`, `Task.sleep(nanoseconds:)` (all
+  iOS 13 or earlier), and `AVAudioFile(forReading:)` in a test.
+- `python Scripts/validate.py` passes: 88 Android interface keys and 2 iOS-only keys in all
+  ten languages, all 85 keys the Swift screens read exist (no new texts were needed: the
+  announcements use `correct` and `try_again`, Next uses `next` and `finish`), the four
+  bundled resources are listed in `project.yml`, and `success.wav` is 16-bit PCM, mono,
+  44.1 kHz, 0.65 seconds.
+- Every changed and new test was traced by hand against `course.json` (for example lesson
+  `cafe` question 6 is the two-word sentence `cafe-6`, wrong in reverse order).
 
 ## QA ISSUE-001: immediate answer feedback with retry (not compiled yet)
+
+Superseded in part by the follow-up above: a right answer no longer waits for Next and no
+longer shows the "That's right" panel, and Next appears only after a wrong answer. The rest of
+this section still holds.
 
 The owner asked (iPad): check an answer as soon as it is selected, without a Check button;
 mark a wrong answer without revealing the right one and let the learner choose again; keep a
@@ -121,14 +207,16 @@ Checked without a compiler:
 
 ## Next steps
 
-1. Commit the ISSUE-001 change and push it when the owner asks.
+1. Commit the ISSUE-001 follow-up and push it when the owner asks.
 2. The owner runs **Verify iOS build and tests** by hand; fix any errors it lists in the run
    summary (compiler errors and failed tests are listed with file and line).
 3. The owner runs **TestFlight upload** and checks on the iPad (and an iPhone): a right tap
-   shows "That's right" and waits for Next; a wrong tap is marked without the answer, another
-   option can be tried, and Next still moves on; a sentence is checked when its last word is
-   placed and can be fixed; the daily goal counts only first-try answers; VoiceOver
-   announcements; Arabic and Hebrew layout.
+   turns green, bounces, chimes, gives a haptic and moves on by itself after about 1.2
+   seconds, with no Next; a wrong tap turns red without the answer, another option can be
+   tried, and only then Next is offered; a right retry moves on by itself; a sentence is
+   checked when its last word is placed, moves on when right and can be fixed when wrong; the
+   chime's volume next to the speech and to music from another app; VoiceOver waits for
+   "That's right" before moving on; Reduce Motion has no bounce; Arabic and Hebrew layout.
 4. Decide whether Android's Ivrit Together should get the same flow (the owner asked to
    compare the apps later).
 5. If not yet done for 1.0.0: App Store screenshots (6.9-inch iPhone, 13-inch iPad), the

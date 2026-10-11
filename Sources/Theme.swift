@@ -13,6 +13,10 @@ enum Palette {
     static let mint = hex(0xE1F0EA)
     static let danger = hex(0x9F3030)
     static let retry = hex(0xFFEDCC)
+    /// A checked practice answer (iOS): green when right, red (with the danger border) when wrong.
+    static let correct = hex(0x2E7D4A)
+    static let correctFill = hex(0xDCF2E1)
+    static let wrongFill = hex(0xFBE3E1)
 
     static func hex(_ value: UInt32) -> Color {
         Color(red: Double((value >> 16) & 0xFF) / 255.0,

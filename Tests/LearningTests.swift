@@ -173,7 +173,8 @@ final class LearningTests: XCTestCase {
     }
 
     // The iOS answer flow (owner QA ISSUE-001): checked on the tap, retry after a wrong answer,
-    // Next manual, and only the first check scores.
+    // Next offered only after a wrong answer (a right one moves on by itself in the view model),
+    // and only the first check scores.
 
     private func choiceSession() -> Session {
         let ps = (0...3).map { index in
@@ -186,21 +187,24 @@ final class LearningTests: XCTestCase {
     func testChoosingAnOptionChecksItAtOnce() {
         let fresh = choiceSession()
         XCTAssertFalse(fresh.checked)
+        XCTAssertFalse(fresh.offersNext, "No Next before an answer")
         XCTAssertEqual(fresh.submit(), fresh, "Nothing is checked before an option is chosen")
         let s = fresh.choose("0")
         XCTAssertTrue(s.checked)
         XCTAssertTrue(s.correct)
         XCTAssertFalse(s.wrong)
+        XCTAssertFalse(s.offersNext, "No Next after a right answer")
         XCTAssertEqual(s.selection, "0")
         XCTAssertEqual(s.tries, 1)
         XCTAssertEqual(s.score, 1)
-        XCTAssertEqual(s.index, 0, "A right answer waits for Next")
-        XCTAssertEqual(s.choose("1"), s, "A solved question is locked until Next")
+        XCTAssertEqual(s.index, 0, "The session stays until the view model moves on")
+        XCTAssertEqual(s.choose("1"), s, "A solved question is locked")
         XCTAssertEqual(s.toggleToken(0), s, "Words belong to sentence questions only")
         let next = s.next()
         XCTAssertEqual(next.index, 1)
         XCTAssertFalse(next.checked)
         XCTAssertFalse(next.correct)
+        XCTAssertFalse(next.offersNext)
         XCTAssertNil(next.selection)
         XCTAssertEqual(next.tries, 0)
         XCTAssertEqual(next.score, 1)
@@ -211,6 +215,7 @@ final class LearningTests: XCTestCase {
         XCTAssertTrue(s.checked)
         XCTAssertTrue(s.wrong)
         XCTAssertFalse(s.correct)
+        XCTAssertTrue(s.offersNext, "Next after a wrong answer")
         XCTAssertEqual(s.wrongChoices, ["2"])
         XCTAssertEqual(s.score, 0)
         XCTAssertEqual(s.choose("2"), s, "An option found wrong is not checked again")
@@ -219,9 +224,11 @@ final class LearningTests: XCTestCase {
         XCTAssertEqual(s.wrongChoices, ["2", "3"])
         XCTAssertEqual(s.tries, 2)
         XCTAssertTrue(s.wrong)
+        XCTAssertTrue(s.offersNext)
         s = s.choose("0")
         XCTAssertTrue(s.correct)
         XCTAssertFalse(s.wrong)
+        XCTAssertFalse(s.offersNext, "No Next once the right answer is found")
         XCTAssertEqual(s.tries, 3)
         XCTAssertEqual(s.score, 0, "Only a right first answer scores")
         XCTAssertEqual(s.wrongChoices, ["2", "3"], "Options found wrong stay marked")
@@ -236,6 +243,7 @@ final class LearningTests: XCTestCase {
         let q = Question(phrase: p, kind: .build, choices: [p], tokens: ["אני", "לומד", "עברית"], tokenOrder: [2, 0, 1])
         var s = Session(questions: [q]).toggleToken(1).toggleToken(0)
         XCTAssertFalse(s.checked, "An unfinished sentence is not checked")
+        XCTAssertFalse(s.offersNext)
         XCTAssertEqual(s.submit(), s)
         XCTAssertEqual(s.choose("p"), s, "A sentence question has no options to choose")
         s = s.toggleToken(2)
@@ -243,14 +251,17 @@ final class LearningTests: XCTestCase {
         XCTAssertTrue(s.checked)
         XCTAssertTrue(s.wrong)
         XCTAssertFalse(s.correct)
+        XCTAssertTrue(s.offersNext, "Next after a wrong sentence")
         XCTAssertEqual(s.tries, 1)
         XCTAssertEqual(s.submit(), s, "An unchanged wrong sentence is not checked again")
         s = s.toggleToken(1).toggleToken(2)
         XCTAssertEqual(s.selectedTokens, [0])
         XCTAssertFalse(s.wrong, "Moving a word clears the wrong mark")
+        XCTAssertTrue(s.offersNext, "Next stays while the sentence is fixed")
         XCTAssertEqual(s.tries, 1)
         s = s.toggleToken(1).toggleToken(2)
         XCTAssertTrue(s.correct)
+        XCTAssertFalse(s.offersNext, "No Next once the sentence is right")
         XCTAssertEqual(s.tries, 2)
         XCTAssertEqual(s.score, 0, "A sentence fixed on a retry does not score")
         XCTAssertEqual(s.toggleToken(0), s, "A solved sentence is locked")

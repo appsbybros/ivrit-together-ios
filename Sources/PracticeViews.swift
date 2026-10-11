@@ -2,23 +2,21 @@ import SwiftUI
 import UIKit
 
 // Port of Practice, Token, ResultPage and MatchPage (MainActivity.kt). Unlike Android, an
-// answer is checked as soon as it is tapped, with no Check button (owner QA ISSUE-001): a wrong
-// answer is marked without showing the right one and can be corrected, and Next stays manual.
-
-/// A VoiceOver announcement, queued after what VoiceOver is saying (such as the tapped
-/// option's new state) so that it is not cut off; Android uses a polite live region.
-@MainActor
-func announceForVoiceOver(_ text: String) {
-    let announcement = NSAttributedString(string: text,
-                                          attributes: [.accessibilitySpeechQueueAnnouncement: true])
-    UIAccessibility.post(notification: .announcement, argument: announcement)
-}
+// answer is checked as soon as it is tapped, with no Check button (owner QA ISSUE-001). A right
+// answer turns green with a check mark, bounces, plays a chime and a success haptic, and the
+// next question follows by itself after about 1.2 seconds (LiveAnswerFeedback). A wrong answer
+// is marked red with a cross, without showing the right one, and can be corrected; only then is
+// Next offered, so the learner can also move on without the answer.
 
 struct PracticeView: View {
     @EnvironmentObject private var vm: LearnViewModel
     @EnvironmentObject private var speech: Speech
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// Android's `remember(session.attemptId) { showText }`.
     @State private var shownTextFor: String? = nil
+    /// The right answer's short bounce: 1 at rest, a little larger for a moment after a right
+    /// answer (never with Reduce Motion).
+    @State private var bounce: CGFloat = 1
 
     var body: some View {
         if let session = vm.session {
@@ -48,19 +46,20 @@ struct PracticeView: View {
                                      identifier: "choice-\(choice.id)") {
                             vm.select(choice.id)
                         }
+                        .scaleEffect(mark == .right ? bounce : 1)
                     }
                 }
-                if session.correct || session.wrong {
-                    feedback(session: session, question: question)
+                if session.wrong {
+                    tryAgain()
                 }
-                // Next stays manual, as in Minik: after the right answer, or after a wrong one
-                // to move on without being shown the answer (then in the secondary style, so
-                // trying again stays the obvious step).
-                if session.checked {
+                // Next only after a wrong answer, to move on without being shown the answer, in
+                // the secondary style so that trying again stays the obvious step. A right
+                // answer moves on by itself.
+                if session.offersNext {
                     ActionButton(title: vm.t(session.isLast ? "finish" : "next"),
                                  identifier: "next-question",
                                  enabled: !vm.busy,
-                                 secondary: !session.correct) {
+                                 secondary: true) {
                         speech.stop()
                         vm.next()
                     }
@@ -71,13 +70,16 @@ struct PracticeView: View {
             .onAppear { playListeningQuestion() }
             .onChange(of: session.attemptId) { _, _ in playListeningQuestion() }
             .onChange(of: speech.ready) { _, _ in playListeningQuestion() }
-            // Android's live region on the feedback text: every checked answer is announced,
-            // including each new try after a wrong one.
-            .onChange(of: session.tries) { _, tries in
-                if tries > 0 {
-                    announceForVoiceOver(vm.t(vm.session?.correct == true ? "correct" : "try_again"))
+            // The success feedback of a right answer. The model announces every checked answer
+            // to VoiceOver and moves on after the pause.
+            .onChange(of: session.correct) { _, solved in
+                if solved {
+                    celebrate()
                 }
             }
+            // Questions move on by themselves, so speech stops when the practice ends, as the
+            // Finish button did.
+            .onDisappear { speech.stop() }
         }
     }
 
@@ -102,6 +104,23 @@ struct PracticeView: View {
         case .unmarked: return ""
         case .right: return vm.t("correct")
         case .wrong: return vm.t("incorrect")
+        }
+    }
+
+    /// A right answer's success feedback: the chime, a success haptic and a short bounce of the
+    /// answer, which Reduce Motion leaves out.
+    private func celebrate() {
+        speech.playSuccess()
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        if reduceMotion { return }
+        withAnimation(.spring(response: 0.2, dampingFraction: 0.5)) {
+            bounce = 1.05
+        }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 200_000_000)
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                bounce = 1
+            }
         }
     }
 
@@ -151,18 +170,28 @@ struct PracticeView: View {
 
     /// Right-to-left sentence construction: the answer row and the word bank both fill from
     /// the right, as Android forces LayoutDirection.Rtl here. The sentence is checked when its
-    /// last word is placed. A wrong sentence is marked (not corrected) and its words stay
-    /// movable, so it can be fixed; a right one is locked until Next.
+    /// last word is placed and marked like an option: a wrong one red with ✗ (not corrected),
+    /// its words still movable so it can be fixed; a right one green with ✓, locked, bouncing
+    /// like a right option and moving on by itself.
     @ViewBuilder
     private func buildArea(session: Session, question: Question) -> some View {
         BodyText(text: vm.t("build_hint"), size: 16, color: Palette.muted)
         BodyText(text: vm.t("your_answer"), weight: .bold)
-        FlowRow(rightToLeft: true) {
-            ForEach(session.selectedTokens, id: \.self) { index in
-                TokenButton(text: tokenText(question, index),
-                            identifier: "chosen-\(index)",
-                            enabled: !session.correct) {
-                    vm.token(index)
+        HStack(alignment: .top, spacing: 8) {
+            // The mark leads the words, as on an option; its slot stays free while the sentence
+            // is unmarked, so the words do not move when it appears.
+            Text(verbatim: answerMark(session))
+                .appFont(19)
+                .foregroundStyle(Palette.ink)
+                .frame(minWidth: 22, minHeight: 54)
+                .accessibilityHidden(true)
+            FlowRow(rightToLeft: true) {
+                ForEach(session.selectedTokens, id: \.self) { index in
+                    TokenButton(text: tokenText(question, index),
+                                identifier: "chosen-\(index)",
+                                enabled: !session.correct) {
+                        vm.token(index)
+                    }
                 }
             }
         }
@@ -173,6 +202,7 @@ struct PracticeView: View {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .strokeBorder(answerBorder(session), lineWidth: 2)
         )
+        .scaleEffect(session.correct ? bounce : 1)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(vm.t("your_answer"))
         .accessibilityIdentifier("answer-tokens")
@@ -187,16 +217,22 @@ struct PracticeView: View {
         }
     }
 
-    /// The answer row is marked like an option: mint when right, the retry colour while a
+    /// The answer row is marked like an option: green with ✓ when right, red with ✗ while a
     /// wrong sentence is unchanged.
+    private func answerMark(_ session: Session) -> String {
+        if session.correct { return "✓" }
+        if session.wrong { return "✗" }
+        return ""
+    }
+
     private func answerFill(_ session: Session) -> Color {
-        if session.correct { return Palette.mint }
-        if session.wrong { return Palette.retry }
+        if session.correct { return Palette.correctFill }
+        if session.wrong { return Palette.wrongFill }
         return Color.clear
     }
 
     private func answerBorder(_ session: Session) -> Color {
-        if session.correct { return Palette.teal }
+        if session.correct { return Palette.correct }
         if session.wrong { return Palette.danger }
         return Palette.teal.opacity(0.3)
     }
@@ -210,22 +246,12 @@ struct PracticeView: View {
         return plain.indices.contains(index) ? String(plain[index]) : question.tokens[index]
     }
 
-    /// The right answer with its Hebrew and meaning, or, after a wrong answer, only the
-    /// invitation to try again: the right answer is not revealed.
-    @ViewBuilder
-    private func feedback(session: Session, question: Question) -> some View {
-        if session.correct {
-            CardPanel(color: Palette.mint) {
-                BodyText(text: "✓ " + vm.t("correct"), size: 23, weight: .bold)
-                    .accessibilityIdentifier("feedback")
-                HebrewText(text: vm.hebrew(question.phrase), size: 29)
-                BodyText(text: question.phrase.meaning(vm.language))
-            }
-        } else {
-            CardPanel(color: Palette.retry) {
-                BodyText(text: "↺ " + vm.t("try_again"), size: 23, weight: .bold)
-                    .accessibilityIdentifier("feedback")
-            }
+    /// After a wrong answer, the invitation to try again: the right answer is not revealed. A
+    /// right answer has no panel; its success feedback is on the answer itself.
+    private func tryAgain() -> some View {
+        CardPanel(color: Palette.retry) {
+            BodyText(text: "↺ " + vm.t("try_again"), size: 23, weight: .bold)
+                .accessibilityIdentifier("feedback")
         }
     }
 }
@@ -286,15 +312,15 @@ struct ChoiceButton: View {
     private var fillColor: Color {
         switch mark {
         case .unmarked: return Color.white
-        case .right: return Palette.mint
-        case .wrong: return Palette.retry
+        case .right: return Palette.correctFill
+        case .wrong: return Palette.wrongFill
         }
     }
 
     private var borderColor: Color {
         switch mark {
         case .unmarked: return Palette.ink.opacity(0.16)
-        case .right: return Palette.teal
+        case .right: return Palette.correct
         case .wrong: return Palette.danger
         }
     }

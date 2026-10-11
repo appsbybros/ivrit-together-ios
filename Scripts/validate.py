@@ -10,6 +10,8 @@ only; it is not a Swift build (the verify workflow compiles and tests on a Mac).
   keys in all ten languages, none empty, none repeating a ui.json key, bundled by project.yml.
 - AppIcon 1024 x 1024 PNG without transparency; asset catalog and privacy manifest parse;
   one InfoPlist.strings per language listed in project.yml.
+- success.wav (the chime after a right answer, Scripts/make_sound.py): 16-bit PCM, mono,
+  44.1 kHz, shorter than the 1.2-second success pause, bundled by project.yml.
 - App Store texts within Apple's limits (name and subtitle 30, keywords 100, description 4000,
   promotional text 170, what's new 4000).
 """
@@ -18,6 +20,7 @@ import plistlib
 import re
 import struct
 import sys
+import wave
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -119,8 +122,19 @@ for name in ("LaunchBackground", "AccentColor"):
     check((assets / f"{name}.colorset/Contents.json").exists(), f"{name} colour missing")
 plistlib.loads((ROOT / "Resources/PrivacyInfo.xcprivacy").read_bytes())
 
+chime = ROOT / "Resources/success.wav"
+chime_seconds = None
+try:
+    with wave.open(str(chime), "rb") as sound:
+        check((sound.getnchannels(), sound.getsampwidth(), sound.getframerate()) == (1, 2, 44100),
+              "success.wav must be 16-bit PCM, mono, 44.1 kHz")
+        chime_seconds = round(sound.getnframes() / sound.getframerate(), 2)
+    check(0.2 < chime_seconds < 1.2, f"success.wav lasts {chime_seconds} s; it must end within the 1.2-second success pause")
+except (OSError, EOFError, wave.Error) as error:
+    problems.append(f"Resources/success.wav cannot be read ({error}); run Scripts/make_sound.py")
+
 project = (ROOT / "project.yml").read_text(encoding="utf-8")
-for resource in ("course.json", "ui.json", "ui-ios.json"):
+for resource in ("course.json", "ui.json", "ui-ios.json", "success.wav"):
     check(f"- path: Resources/{resource}\n        buildPhase: resources" in project,
           f"project.yml does not bundle Resources/{resource}")
 listed = re.search(r"CFBundleLocalizations: \[([^\]]+)\]", project)
@@ -153,6 +167,7 @@ if problems:
 print(json.dumps({
     "lessons": len(lessons), "phrases": len(phrases), "letters": len(course["alphabet"]),
     "interfaceKeys": len(all_keys), "iosOnlyInterfaceKeys": len(ios_keys), "keysReadBySwift": len(used),
+    "successChimeSeconds": chime_seconds,
     "storeTextLengths": lengths,
     "swiftCompilation": "not performed by this script",
 }, ensure_ascii=False, indent=1))

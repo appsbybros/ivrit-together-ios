@@ -1,17 +1,51 @@
 import XCTest
 @testable import IvritTogether
 
+/// Answer feedback whose pause the test ends itself: after a right answer the model's move on
+/// waits in `pending` until `endPause()`, so no test sleeps.
+@MainActor
+private final class ManualAnswerFeedback: AnswerFeedback {
+    private(set) var announcements: [String] = []
+    private(set) var pending: (@MainActor () -> Void)?
+
+    /// A right answer is waiting for the end of its success feedback.
+    var waiting: Bool { pending != nil }
+
+    func right(announcement: String, then advance: @escaping @MainActor () -> Void) {
+        announcements.append(announcement)
+        pending = advance
+    }
+
+    func wrong(announcement: String) {
+        announcements.append(announcement)
+    }
+
+    func cancel() {
+        pending = nil
+    }
+
+    /// The success feedback has had its time: the model moves on.
+    func endPause() {
+        let advance = pending
+        pending = nil
+        advance?()
+    }
+}
+
 /// The screen flows of LearningDeviceTest.kt, driven through the model the SwiftUI screens use.
 @MainActor
 final class LearnViewModelTests: XCTestCase {
     @MainActor
     private struct Fixture {
         let model: LearnViewModel
+        let feedback: ManualAnswerFeedback
         let defaults: UserDefaults
         let suite: String
 
         func reopen() throws -> LearnViewModel {
-            LearnViewModel(course: try Course(bundle: Bundle(for: Course.self)), store: LocalStore(defaults: defaults))
+            LearnViewModel(course: try Course(bundle: Bundle(for: Course.self)),
+                           store: LocalStore(defaults: defaults),
+                           feedback: ManualAnswerFeedback())
         }
 
         func remove() {
@@ -25,12 +59,15 @@ final class LearnViewModelTests: XCTestCase {
         defaults.set(language, forKey: "language")
         configure(defaults)
         let course = try Course(bundle: Bundle(for: Course.self))
-        return Fixture(model: LearnViewModel(course: course, store: LocalStore(defaults: defaults)), defaults: defaults, suite: suite)
+        let feedback = ManualAnswerFeedback()
+        return Fixture(model: LearnViewModel(course: course, store: LocalStore(defaults: defaults), feedback: feedback),
+                       feedback: feedback, defaults: defaults, suite: suite)
     }
 
-    /// No Check button: a tap checks the answer, a solved question ignores further taps and
-    /// waits for Next, and each question is saved once.
-    func testAnswersAreCheckedOnTapAndRepeatedTapsCountOnce() throws {
+    /// No Check button and no Next after a right answer: a tap checks the answer, the success
+    /// feedback is announced, a solved question ignores further taps and Next, and the next
+    /// question follows by itself once the pause ends. Each question is saved once.
+    func testRightAnswersAreCheckedOnTapAndMoveOnByThemselves() throws {
         let fixture = try makeFixture()
         defer { fixture.remove() }
         let vm = fixture.model
@@ -62,19 +99,29 @@ final class LearnViewModelTests: XCTestCase {
             XCTAssertTrue(solved.checked, "The answer is checked without a Check button")
             XCTAssertTrue(solved.correct)
             XCTAssertFalse(solved.wrong)
+            XCTAssertFalse(solved.offersNext, "No Next after a right answer")
             XCTAssertEqual(solved.tries, 1)
-            XCTAssertEqual(solved.index, position, "Next stays manual")
+            XCTAssertEqual(solved.index, position, "The success feedback plays before moving on")
+            XCTAssertTrue(fixture.feedback.waiting, "A right answer moves on by itself")
+            XCTAssertEqual(fixture.feedback.announcements.last, vm.t("correct"))
             XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
-            // Further taps on a solved question change nothing and are not saved again.
+            // Further taps and Next change nothing on a solved question and save nothing again.
             if q.kind == .build {
                 vm.token(0)
             } else {
                 vm.select(q.phrase.id)
                 vm.select(try XCTUnwrap(q.choices.first { $0.id != q.phrase.id }).id)
             }
+            vm.next()
             XCTAssertEqual(vm.session, solved)
             XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
-            vm.next()
+            XCTAssertEqual(fixture.feedback.announcements.count, position + 1, "Each answer is announced once")
+            fixture.feedback.endPause()
+            if position < 5 {
+                let moved = try XCTUnwrap(vm.session)
+                XCTAssertEqual(moved.index, position + 1, "The next question follows by itself")
+                XCTAssertFalse(moved.checked)
+            }
         }
         XCTAssertNil(vm.session)
         XCTAssertEqual(vm.result?.score, 6)
@@ -150,7 +197,7 @@ final class LearnViewModelTests: XCTestCase {
         vm.beginCurrentLesson()
         for _ in 0..<2 {
             vm.select(try XCTUnwrap(vm.session).question.phrase.id)
-            vm.next()
+            fixture.feedback.endPause()
         }
         let q = try XCTUnwrap(vm.session).question
         XCTAssertEqual(q.kind, .build)
@@ -178,7 +225,7 @@ final class LearnViewModelTests: XCTestCase {
             } else {
                 vm.select(q.phrase.id)
             }
-            vm.next()
+            fixture.feedback.endPause()
         }
         XCTAssertEqual(vm.result?.score, 10)
         XCTAssertTrue(vm.progress.completed.isEmpty, "Daily practice completes no lesson")
@@ -188,6 +235,8 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertEqual(vm.tab, "today")
     }
 
+    /// Leaving during the success feedback keeps the saved answer and cancels the move on; a
+    /// late move on from the left practice changes nothing in a new one.
     func testLeavingKeepsCheckedAnswers() throws {
         let fixture = try makeFixture()
         defer { fixture.remove() }
@@ -196,16 +245,25 @@ final class LearnViewModelTests: XCTestCase {
         vm.beginCurrentLesson()
         let q = try XCTUnwrap(vm.session).question
         vm.select(q.phrase.id)
+        XCTAssertTrue(fixture.feedback.waiting)
+        let late = fixture.feedback.pending
         vm.abandon()
+        XCTAssertFalse(fixture.feedback.waiting, "Leaving cancels the move on")
         XCTAssertNil(vm.session)
         XCTAssertEqual(vm.lessonId, "cafe")
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
         XCTAssertFalse(vm.progress.completed.contains("cafe"))
+        vm.beginCurrentLesson()
+        let fresh = try XCTUnwrap(vm.session)
+        late?()
+        XCTAssertEqual(vm.session, fresh)
+        XCTAssertNil(vm.result)
     }
 
-    /// A wrong tap is marked without revealing the right answer and can be corrected, but the
-    /// first answer decides the score, the spaced review and the daily goal.
-    func testWrongTapIsMarkedWithoutTheAnswerAndCanBeRetried() throws {
+    /// A wrong tap is marked without revealing the right answer, offers Next and can be
+    /// corrected. The right answer found on a retry plays the success feedback and moves on by
+    /// itself, but the first answer decides the score, the spaced review and the daily goal.
+    func testWrongTapIsMarkedWithoutTheAnswerAndARetryMovesOnByItself() throws {
         let fixture = try makeFixture()
         defer { fixture.remove() }
         let vm = fixture.model
@@ -220,8 +278,11 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertTrue(s.checked, "A wrong tap is checked at once")
         XCTAssertTrue(s.wrong)
         XCTAssertFalse(s.correct, "The right answer is not revealed")
+        XCTAssertTrue(s.offersNext, "Next is offered after a wrong answer")
         XCTAssertEqual(s.wrongChoices, [wrongs[0].id])
         XCTAssertEqual(s.score, 0)
+        XCTAssertFalse(fixture.feedback.waiting, "A wrong answer does not move on by itself")
+        XCTAssertEqual(fixture.feedback.announcements, [vm.t("try_again")])
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.stage, 0)
         // The same wrong option again changes nothing.
@@ -233,14 +294,20 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertEqual(s.wrongChoices, [wrongs[0].id, wrongs[1].id])
         XCTAssertEqual(s.tries, 2)
         XCTAssertFalse(s.correct)
+        XCTAssertTrue(s.offersNext)
         XCTAssertEqual(s.index, 0, "A wrong answer does not move on by itself")
-        // The right option is accepted on a retry...
+        XCTAssertFalse(fixture.feedback.waiting)
+        // The right option is accepted on a retry: Next goes away, the success feedback is
+        // announced, and the next question follows by itself...
         vm.select(q.phrase.id)
         s = try XCTUnwrap(vm.session)
         XCTAssertTrue(s.correct)
         XCTAssertFalse(s.wrong)
+        XCTAssertFalse(s.offersNext, "No Next once the right answer is found")
         XCTAssertEqual(s.tries, 3)
-        XCTAssertEqual(s.index, 0, "Next stays manual")
+        XCTAssertEqual(s.index, 0, "The success feedback plays before moving on")
+        XCTAssertTrue(fixture.feedback.waiting)
+        XCTAssertEqual(fixture.feedback.announcements, [vm.t("try_again"), vm.t("try_again"), vm.t("correct")])
         // ...but only the first answer counts: no score, no spaced progress, no daily goal.
         XCTAssertEqual(s.score, 0)
         let word = try XCTUnwrap(vm.progress.words[q.phrase.id])
@@ -248,12 +315,21 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertEqual(word.correct, 0)
         XCTAssertEqual(word.stage, 0)
         XCTAssertEqual(vm.progress.dailyCount(LocalDay.today()), 0)
-        // The solved question is locked.
+        // The solved question is locked, and Next is not offered.
         vm.select(wrongs[2].id)
+        vm.next()
         XCTAssertEqual(vm.session, s)
+        fixture.feedback.endPause()
+        let moved = try XCTUnwrap(vm.session)
+        XCTAssertEqual(moved.index, 1, "The next question follows by itself")
+        XCTAssertFalse(moved.checked)
+        XCTAssertTrue(moved.wrongChoices.isEmpty)
+        XCTAssertEqual(moved.score, 0)
         XCTAssertEqual(try fixture.reopen().progress, vm.progress)
     }
 
+    /// Next is offered only after a wrong answer: not before an answer and not after a right
+    /// one. It moves on without showing the answer, and nothing moves on by itself.
     func testNextAfterAWrongAnswerMovesOnWithoutTheAnswer() throws {
         let fixture = try makeFixture()
         defer { fixture.remove() }
@@ -261,16 +337,56 @@ final class LearnViewModelTests: XCTestCase {
         vm.openLesson("cafe")
         vm.beginCurrentLesson()
         let q = try XCTUnwrap(vm.session).question
+        XCTAssertFalse(try XCTUnwrap(vm.session).offersNext, "No Next before an answer")
+        vm.next()
+        XCTAssertEqual(vm.session?.index, 0)
         vm.select(try XCTUnwrap(q.choices.first { $0.id != q.phrase.id }).id)
+        XCTAssertTrue(try XCTUnwrap(vm.session).offersNext)
         vm.next()
         let moved = try XCTUnwrap(vm.session)
         XCTAssertEqual(moved.index, 1)
         XCTAssertFalse(moved.checked)
         XCTAssertFalse(moved.wrong)
+        XCTAssertFalse(moved.offersNext, "The new question has no Next until it is answered wrongly")
         XCTAssertNil(moved.selection)
         XCTAssertTrue(moved.wrongChoices.isEmpty)
         XCTAssertEqual(moved.score, 0)
+        XCTAssertFalse(fixture.feedback.waiting, "Nothing moves on by itself after a wrong answer")
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.correct, 0)
+    }
+
+    /// On the last question, Next after a wrong answer finishes the practice; the questions
+    /// answered right before it moved on by themselves.
+    func testNextOnTheLastQuestionAfterAWrongAnswerFinishes() throws {
+        let fixture = try makeFixture()
+        defer { fixture.remove() }
+        let vm = fixture.model
+        vm.openLesson("cafe")
+        vm.beginCurrentLesson()
+        for _ in 0..<5 {
+            let q = try XCTUnwrap(vm.session).question
+            if q.kind == .build {
+                for index in q.tokens.indices { vm.token(index) }
+            } else {
+                vm.select(q.phrase.id)
+            }
+            fixture.feedback.endPause()
+        }
+        let last = try XCTUnwrap(vm.session)
+        XCTAssertTrue(last.isLast)
+        XCTAssertEqual(last.question.kind, .build)
+        XCTAssertEqual(last.question.phrase.id, "cafe-6")
+        XCTAssertEqual(last.question.tokens.count, 2)
+        // The two words in reverse order make a wrong sentence.
+        vm.token(1)
+        vm.token(0)
+        XCTAssertTrue(try XCTUnwrap(vm.session).wrong)
+        XCTAssertTrue(try XCTUnwrap(vm.session).offersNext)
+        XCTAssertFalse(fixture.feedback.waiting)
+        vm.next()
+        XCTAssertNil(vm.session)
+        XCTAssertEqual(vm.result?.score, 5)
+        XCTAssertTrue(vm.progress.completed.contains("cafe"))
     }
 
     /// Sentence building is checked when the last word is placed; a wrong sentence stays as
@@ -283,7 +399,7 @@ final class LearnViewModelTests: XCTestCase {
         vm.beginCurrentLesson()
         for _ in 0..<2 {
             vm.select(try XCTUnwrap(vm.session).question.phrase.id)
-            vm.next()
+            fixture.feedback.endPause()
         }
         let q = try XCTUnwrap(vm.session).question
         XCTAssertEqual(q.kind, .build)
@@ -297,26 +413,37 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertTrue(s.checked, "Placing the last word checks the sentence")
         XCTAssertTrue(s.wrong)
         XCTAssertFalse(s.correct)
+        XCTAssertTrue(s.offersNext, "Next is offered after a wrong sentence")
+        XCTAssertFalse(fixture.feedback.waiting)
+        XCTAssertEqual(fixture.feedback.announcements.last, vm.t("try_again"))
         XCTAssertEqual(s.selectedTokens, reversed, "The words stay where the learner put them")
         XCTAssertEqual(s.score, 2)
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.stage, 0)
-        // Moving a word back clears the mark; the sentence can then be built again.
+        // Moving a word back clears the mark (Next stays); the sentence can then be built again.
         vm.token(reversed[0])
         s = try XCTUnwrap(vm.session)
         XCTAssertFalse(s.wrong)
+        XCTAssertTrue(s.offersNext)
         XCTAssertEqual(s.tries, 1)
         for index in s.selectedTokens { vm.token(index) }
         XCTAssertTrue(try XCTUnwrap(vm.session).selectedTokens.isEmpty)
         for index in q.tokens.indices { vm.token(index) }
         s = try XCTUnwrap(vm.session)
         XCTAssertTrue(s.correct)
+        XCTAssertFalse(s.offersNext, "No Next once the sentence is right")
         XCTAssertEqual(s.tries, 2)
         XCTAssertEqual(s.score, 2, "A sentence fixed on a retry does not score")
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.correct, 0)
+        XCTAssertEqual(fixture.feedback.announcements.last, vm.t("correct"))
         vm.token(0)
+        vm.next()
         XCTAssertEqual(vm.session, s, "A solved sentence is locked")
+        // The fixed sentence moves on by itself, like a right first answer.
+        fixture.feedback.endPause()
+        XCTAssertEqual(vm.session?.index, 3)
+        XCTAssertEqual(vm.session?.checked, false)
     }
 
     func testAnAnswerThatCannotBeSavedIsNotShownAsChecked() throws {
@@ -333,6 +460,8 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertEqual(vm.error, "save_error")
         XCTAssertFalse(try XCTUnwrap(vm.session).checked)
         XCTAssertNil(vm.progress.words[q.phrase.id])
+        XCTAssertFalse(fixture.feedback.waiting, "An unsaved answer does not move on")
+        XCTAssertTrue(fixture.feedback.announcements.isEmpty, "An unsaved answer is not announced")
         vm.next()
         XCTAssertEqual(vm.session?.index, 0)
     }

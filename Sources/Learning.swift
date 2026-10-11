@@ -271,10 +271,11 @@ struct Question: Equatable, Sendable {
 
 /// A practice session. iOS checks every answer as soon as it is given (owner QA ISSUE-001;
 /// Android checks with a Check button): a chosen option at once, a built sentence when its
-/// last word is placed. A right answer locks the question until Next. A wrong one is marked
-/// without showing the right answer, and the learner may try again or move on with Next.
-/// Only the first check of a question counts: it alone scores, and the view model saves it
-/// alone to the spaced review and the daily goal.
+/// last word is placed. A right answer locks the question, and the view model moves on by
+/// itself after the success feedback. A wrong one is marked without showing the right answer,
+/// and the learner may try again or move on with Next. Only the first check of a question
+/// counts: it alone scores, and the view model saves it alone to the spaced review and the
+/// daily goal.
 struct Session: Equatable, Sendable {
     var id: String = UUID().uuidString.lowercased()
     var lessonId: String? = nil
@@ -287,7 +288,8 @@ struct Session: Equatable, Sendable {
     var wrongChoices: [String] = []
     /// How many answers to this question have been checked.
     var tries: Int = 0
-    /// The last checked answer is right: the question is solved and locked until Next.
+    /// The last checked answer is right: the question is solved and locked until the view
+    /// model moves on.
     var correct: Bool = false
     /// The last checked answer is wrong and still unchanged (moving a word clears it).
     var wrong: Bool = false
@@ -296,8 +298,12 @@ struct Session: Equatable, Sendable {
     var question: Question { questions[index] }
     var attemptId: String { "\(id):\(index)" }
     var isLast: Bool { index == questions.count - 1 }
-    /// The first answer to this question has been checked (and saved), so Next is available.
+    /// The first answer to this question has been checked (and saved).
     var checked: Bool { tries > 0 }
+    /// A wrong answer has been checked and the question is not solved: Next lets the learner
+    /// move on without being shown the answer. A right answer moves on by itself, so it never
+    /// offers Next.
+    var offersNext: Bool { checked && !correct }
     /// Every word of the sentence is in the answer.
     var sentenceComplete: Bool { selectedTokens.count == question.tokens.count }
 
