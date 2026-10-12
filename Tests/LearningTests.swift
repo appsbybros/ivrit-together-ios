@@ -174,7 +174,7 @@ final class LearningTests: XCTestCase {
 
     // The iOS answer flow (owner QA ISSUE-001): checked on the tap, retry after a wrong answer,
     // Next offered only after a wrong answer (a right one moves on by itself in the view model),
-    // and only the first check scores.
+    // and points: two for a right answer first time, one for a right answer after another try.
 
     private func choiceSession() -> Session {
         let ps = (0...3).map { index in
@@ -196,7 +196,8 @@ final class LearningTests: XCTestCase {
         XCTAssertFalse(s.offersNext, "No Next after a right answer")
         XCTAssertEqual(s.selection, "0")
         XCTAssertEqual(s.tries, 1)
-        XCTAssertEqual(s.score, 1)
+        XCTAssertEqual(s.score, 2, "A right answer first time earns two points")
+        XCTAssertEqual(s.maxScore, 4, "Two questions, two points each")
         XCTAssertEqual(s.index, 0, "The session stays until the view model moves on")
         XCTAssertEqual(s.choose("1"), s, "A solved question is locked")
         XCTAssertEqual(s.toggleToken(0), s, "Words belong to sentence questions only")
@@ -207,10 +208,10 @@ final class LearningTests: XCTestCase {
         XCTAssertFalse(next.offersNext)
         XCTAssertNil(next.selection)
         XCTAssertEqual(next.tries, 0)
-        XCTAssertEqual(next.score, 1)
+        XCTAssertEqual(next.score, 2)
     }
 
-    func testWrongChoiceIsMarkedAndOnlyTheFirstTryScores() {
+    func testWrongChoiceIsMarkedAndARightRetryEarnsOnePoint() {
         var s = choiceSession().choose("2")
         XCTAssertTrue(s.checked)
         XCTAssertTrue(s.wrong)
@@ -230,12 +231,12 @@ final class LearningTests: XCTestCase {
         XCTAssertFalse(s.wrong)
         XCTAssertFalse(s.offersNext, "No Next once the right answer is found")
         XCTAssertEqual(s.tries, 3)
-        XCTAssertEqual(s.score, 0, "Only a right first answer scores")
+        XCTAssertEqual(s.score, 1, "A right answer after another try earns one point")
         XCTAssertEqual(s.wrongChoices, ["2", "3"], "Options found wrong stay marked")
         let next = s.next()
         XCTAssertTrue(next.wrongChoices.isEmpty)
         XCTAssertFalse(next.wrong)
-        XCTAssertEqual(next.choose("0").score, 1)
+        XCTAssertEqual(next.choose("0").score, 3, "Then two for a right answer first time")
     }
 
     func testSentenceIsCheckedWhenItsLastWordIsPlacedAndCanBeFixed() {
@@ -263,7 +264,7 @@ final class LearningTests: XCTestCase {
         XCTAssertTrue(s.correct)
         XCTAssertFalse(s.offersNext, "No Next once the sentence is right")
         XCTAssertEqual(s.tries, 2)
-        XCTAssertEqual(s.score, 0, "A sentence fixed on a retry does not score")
+        XCTAssertEqual(s.score, 1, "A sentence fixed on a retry earns one point")
         XCTAssertEqual(s.toggleToken(0), s, "A solved sentence is locked")
     }
 }

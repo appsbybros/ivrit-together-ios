@@ -8,11 +8,50 @@ Date: 2026-10-12. Version 1.0.0 (build number set by the TestFlight workflow),
 - **Version 1.0.0 as first committed (`bb4464c`)**: the owner reports that all steps are done
   and all builds are green; the TestFlight build was installed and tested on an iPad (QA
   report of 11 October 2026).
-- **Practice change for QA ISSUE-001 (`64553ab`) and its follow-up (below, not committed)**:
-  written on Windows, where no Swift compiler or Xcode exists. **Not compiled, run or tested
-  yet.**
+- **Practice change for QA ISSUE-001 (`64553ab`), its follow-up (`1c7e36b`), the text review
+  (`e1a5915`) and the owner's decisions of 12 October (below)**: written on Windows, where no
+  Swift compiler or Xcode exists. **Not compiled, run or tested yet.**
+
+## Owner's decisions of 12 October 2026 (not compiled yet)
+
+- **"That's right" panel back.** Only the Check button was to go; the panel had been removed
+  by mistake. After a right answer Android's panel shows again (mint, "✓ That's right", the
+  Hebrew at 29 points and its meaning) during the success feedback; the page scrolls just
+  enough to show it if it is below the screen (`Page(focus:)`, `ScrollViewReader`, no
+  animation with Reduce Motion), and every question starts at the top of the page
+  (`Page(start:)`), so the next one is not shown scrolled down. The pause is now 1.5 seconds
+  (the longest of the owner's 1 to 1.5), so the panel can be read.
+- **The chime respects silent mode.** `Speech.playSuccess()` plays `success.wav` as a system
+  sound (`AudioServicesCreateSystemSoundID`, `AudioServicesPlaySystemSound`): not played
+  while the device is silenced (ring/silent switch or Silent Mode), at the system sound
+  volume, mixing with the speech and other apps' audio without lowering them; it no longer
+  activates the app's audio session. Speech is unchanged (plays on silent, as Android).
+- **Points.** The owner: a right answer after another try should earn less (1) than a right
+  answer first time. A right answer now earns 2 points first time and 1 after another try;
+  moving on with Next earns none (`Points`, `Session.score`, `Session.maxScore`). The result
+  shows the points out of the most possible ("Points", 2 per question) and the rule. The
+  daily goal is 10 points (`LearnerProgress.dailyGoalPoints`, `dailyPoints`): 2 for each
+  phrase answered right first time that day, 1 for each phrase found only after another try,
+  each phrase once a day with its best result. The first answer alone still decides the
+  spaced review: a phrase found after another try comes back after 20 minutes. Phrases found
+  after another try are saved by day in `dailyRetried`, kept 60 days and written to the
+  progress JSON only once there is one, so older progress loads unchanged.
+- Texts: four new iOS-only keys in all ten languages (`points`, `points_rule`,
+  `daily_goal_points`, `daily_goal_points_done`), written in each language's existing voice
+  (formal in Russian, Ukrainian, French and Amharic; informal in Spanish and German; plural in
+  Hebrew). The screens no longer read Android's `score`, `daily_goal` and `daily_goal_done`.
+- Tests: 69 (was 66): points first time and after another try in `LearningTests` and
+  `LearnViewModelTests`, daily points and their 60-day history in `DailyGoalTests`, and
+  `dailyRetried` saved and restored in `LocalStoreTests`.
+- Checked without a compiler: all 21 Swift files parse in tree-sitter-swift and their
+  delimiters balance; `python Scripts/validate.py` passes (6 iOS-only keys in ten languages,
+  every key the Swift screens read exists, the chime shorter than the 1.5-second pause).
 
 ## QA ISSUE-001 follow-up: a right answer moves on by itself (not compiled yet)
+
+Superseded in part by the owner's decisions above: the "That's right" panel is shown again,
+the pause is 1.5 seconds, the chime is a system sound that respects silent mode, and answers
+score points.
 
 The owner's spec (12 October 2026): after a right answer, about 1 to 1.5 seconds of pleasant
 success feedback, then the next item by itself, with no Next button; Next appears only after
@@ -207,19 +246,21 @@ Checked without a compiler:
 
 ## Next steps
 
-1. Commit the ISSUE-001 follow-up and push it when the owner asks.
-2. The owner runs **Verify iOS build and tests** by hand; fix any errors it lists in the run
+1. The owner runs **Verify iOS build and tests** by hand; fix any errors it lists in the run
    summary (compiler errors and failed tests are listed with file and line).
-3. The owner runs **TestFlight upload** and checks on the iPad (and an iPhone): a right tap
-   turns green, bounces, chimes, gives a haptic and moves on by itself after about 1.2
-   seconds, with no Next; a wrong tap turns red without the answer, another option can be
-   tried, and only then Next is offered; a right retry moves on by itself; a sentence is
-   checked when its last word is placed, moves on when right and can be fixed when wrong; the
-   chime's volume next to the speech and to music from another app; VoiceOver waits for
-   "That's right" before moving on; Reduce Motion has no bounce; Arabic and Hebrew layout.
-4. Decide whether Android's Ivrit Together should get the same flow (the owner asked to
+2. The owner runs **TestFlight upload** and checks on the iPad (and an iPhone): a right tap
+   turns green, bounces, shows "That's right" with the Hebrew and its meaning (scrolled into
+   view on a small screen), chimes, gives a haptic and moves on by itself after 1.5 seconds,
+   with no Next; with the device silenced there is no chime, and music from another app is
+   not lowered by it; a wrong tap turns red without the answer, another option can be tried,
+   and only then Next is offered; a right retry moves on by itself; a sentence is checked
+   when its last word is placed, moves on when right and can be fixed when wrong; the result
+   shows points (2 first time, 1 after another try) and the home card's daily goal counts to
+   10 points; VoiceOver waits for "That's right" before moving on; Reduce Motion has no
+   bounce; Arabic and Hebrew layout.
+3. Decide whether Android's Ivrit Together should get the same flow (the owner asked to
    compare the apps later).
-5. If not yet done for 1.0.0: App Store screenshots (6.9-inch iPhone, 13-inch iPad), the
+4. If not yet done for 1.0.0: App Store screenshots (6.9-inch iPhone, 13-inch iPad), the
    public privacy and support pages, and App Review submission.
 
 ## Known limits

@@ -2,8 +2,9 @@ import UIKit
 
 // What a checked practice answer does beyond the screen (owner QA ISSUE-001): VoiceOver hears
 // whether it is right, and a right answer moves on by itself once its success feedback has
-// played. PracticeView plays that feedback (the green mark, the bounce, the chime and the
-// success haptic); this file decides when the next question comes.
+// played. PracticeView plays that feedback (the green mark, the bounce, the "That's right"
+// panel with the phrase's Hebrew and meaning, the chime and the success haptic); this file
+// decides when the next question comes.
 
 /// A VoiceOver announcement, queued after what VoiceOver is saying (such as the tapped
 /// option's new state) so that it is not cut off; Android uses a polite live region.
@@ -29,13 +30,14 @@ protocol AnswerFeedback: AnyObject {
 }
 
 /// The app's answer feedback. After a right answer the success feedback stays on screen for
-/// `successSeconds` (the owner asked for 1 to 1.5 seconds), then the next question follows. With
+/// `successSeconds` (the owner asked for 1 to 1.5 seconds; the longest, so that the panel with
+/// the Hebrew and its meaning can be read), then the next question follows. With
 /// VoiceOver running it also waits until the announcement has been spoken, checking every
 /// `pollSeconds` at most `maxPolls` times (10 seconds more), so a lost notification cannot keep
 /// a solved question on screen. Reduce Motion changes nothing here: the pause stays.
 @MainActor
 final class LiveAnswerFeedback: AnswerFeedback {
-    static let successSeconds: Double = 1.2
+    static let successSeconds: Double = 1.5
     static let pollSeconds: Double = 0.1
     static let maxPolls = 100
 

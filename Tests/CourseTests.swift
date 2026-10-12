@@ -8,16 +8,17 @@ final class CourseTests: XCTestCase {
 
     /// Every interface key the iOS screens read (Sources/*.swift), including keys chosen at
     /// runtime: navigation labels, exercise headings, feedback and error messages. Android's
-    /// "check", "continue" and "not_yet" are not read: iOS checks answers on the tap.
+    /// "check", "continue" and "not_yet" are not read: iOS checks answers on the tap. Nor are
+    /// "score", "daily_goal" and "daily_goal_done": iOS counts points (see Points).
     private let keysUsedByTheApp: [String] = [
         "about", "again", "all", "all_topics", "alphabet", "back", "brand", "build", "build_hint",
         "cancel", "choose_language", "choose_meaning", "close", "complete",
-        "continue_lesson", "correct", "daily_body", "daily_goal", "daily_goal_done", "daily_practice",
+        "continue_lesson", "correct", "daily_body", "daily_goal_points", "daily_goal_points_done", "daily_practice",
         "daily_title", "days", "delete", "empty", "everyday", "feminine", "finish", "forms", "forms_help",
         "home", "incorrect", "journey", "language", "learn", "learned", "leave", "leave_body", "letters_hint",
         "listen", "listen_choose", "masculine", "match", "match_hint", "match_miss", "matched", "next",
-        "no_external_app", "ok", "practice", "previous", "privacy", "privacy_body", "rate_app",
-        "reset", "reset_confirm", "result_tip", "review_due", "save", "save_error", "saved", "score",
+        "no_external_app", "ok", "points", "points_rule", "practice", "previous", "privacy", "privacy_body",
+        "rate_app", "reset", "reset_confirm", "result_tip", "review_due", "save", "save_error", "saved",
         "search", "send_feedback", "settings", "share_app", "show_meaning", "show_text", "slow",
         "sound_hint", "start", "storage_error", "tab_words", "today", "transliteration", "try_again",
         "unsave", "up_to_date", "voice_missing", "voice_settings", "vowels", "welcome", "welcome_body",
@@ -25,7 +26,9 @@ final class CourseTests: XCTestCase {
     ]
 
     /// The texts only the iOS screens use (Resources/ui-ios.json).
-    private let iosOnlyKeys: Set<String> = ["incorrect", "try_again"]
+    private let iosOnlyKeys: Set<String> = [
+        "daily_goal_points", "daily_goal_points_done", "incorrect", "points", "points_rule", "try_again"
+    ]
 
     private var bundle: Bundle { Bundle(for: Course.self) }
 

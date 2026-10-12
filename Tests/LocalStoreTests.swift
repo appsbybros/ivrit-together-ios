@@ -128,6 +128,21 @@ final class LocalStoreTests: XCTestCase {
         XCTAssertEqual(progress.dailyCount(day), 1)
     }
 
+    /// iOS adds dailyRetried, only once there is a phrase found after another try.
+    func testPointsFoundAfterAnotherTryAreSavedAndRestored() throws {
+        let defaults = makeDefaults()
+        let progress = LearnerProgress()
+            .answer(attemptId: "a", phraseId: "hello-1", correct: false, now: 1, date: day)
+            .retried(phraseId: "hello-1", date: day)
+        XCTAssertTrue(LocalStore(defaults: defaults).save(progress))
+        let loaded = LocalStore(defaults: defaults).load()
+        XCTAssertEqual(loaded, progress)
+        XCTAssertEqual(loaded.dailyPoints(day), 1)
+        let text = try ProgressCodec.encode(progress)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(text.utf8)) as? [String: Any])
+        XCTAssertEqual(object["dailyRetried"] as? [String: [String]], [day.iso: ["hello-1"]])
+    }
+
     func testOptionalListsMayBeMissing() throws {
         let progress = try ProgressCodec.decode(#"{"version":1,"words":{}}"#)
         XCTAssertEqual(progress, LearnerProgress())

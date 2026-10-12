@@ -18,18 +18,18 @@ happen next.
 - Learning cards, meaning and listening questions, right-to-left sentence construction,
   matching, a searchable phrasebook with saved phrases, and spaced review.
 - Practice checks each answer as soon as it is tapped (a sentence when its last word is
-  placed). A right answer turns green with a check mark, bounces, plays a short chime and a
-  success haptic, and the next question follows by itself after about 1.2 seconds. A wrong
-  answer is marked red without revealing the right one and can be corrected; only then is
-  Next offered, to move on without the answer.
+  placed). A right answer turns green with a check mark, bounces, shows "That's right" with
+  the Hebrew and its meaning, plays a short chime (not in silent mode) and a success haptic,
+  and the next question follows by itself after 1.5 seconds. A wrong answer is marked red
+  without revealing the right one and can be corrected; only then is Next offered, to move on
+  without the answer. A right answer earns 2 points first time and 1 point after another try.
 - Interface and meanings in English, Russian, Ukrainian, French, Spanish, Portuguese,
   Arabic, Amharic, German and Hebrew, with right-to-left layout for Arabic and Hebrew and
   no English fallback.
 - Optional vowel marks and pronunciation guides, masculine or feminine examples.
 - Hebrew speech with Apple's on-device voices at normal and slow speed; without a Hebrew
   voice the app explains this and Voice settings opens the app's page in Settings.
-- A daily goal of five different phrases with a progress bar, practice-day streak and
-  phrases practised.
+- A daily goal of 10 points with a progress bar, practice-day streak and phrases practised.
 - Rate, Share and Send feedback. The light palette stays readable in Dark Mode, text
   follows Dynamic Type (the bottom bar becomes a two-by-two grid at large sizes, as on
   Android) and controls have VoiceOver labels.
@@ -57,19 +57,19 @@ The Swift code ports every rule of `Learning.kt`, `Data.kt`, `LearnViewModel.kt`
 
 Spaced review keeps Android's intervals (20 minutes, 1, 3, 7, 14 and 30 days), early
 repeats do not advance a stage, a wrong answer resets it, repeated taps on the same answer
-count once, the daily goal counts five different correctly answered phrases per day, the
-last 60 days and 600 attempt ids are kept, and unreadable saved progress is preserved
-(saving is refused) until the learner resets it. With iOS's retry after a wrong answer
-(below), only the first answer to each question is saved: it alone decides the score, the
-spaced review and the daily goal, so a phrase found on a later try counts as not known yet.
+count once, the last 60 days and 600 attempt ids are kept, and unreadable saved progress is
+preserved (saving is refused) until the learner resets it. With iOS's retry after a wrong
+answer (below), the first answer to each question alone decides the spaced review, so a
+phrase found on a later try counts as not known yet and comes back after 20 minutes.
 
 ### Deliberate iOS differences
 
 - **Practice answers** (owner QA report ISSUE-001, 11 and 12 October 2026; Android still
   has a Check button). A tap on an option checks it at once. A right option turns green with
-  ✓ and bounces briefly, a short two-note chime (`Resources/success.wav`) and a success haptic
-  play, and after about 1.2 seconds the next question (or the result) follows by itself;
-  there is no Next after a right answer. A wrong option turns red with ✗ and cannot be chosen
+  ✓ and bounces briefly, Android's "That's right" panel shows the Hebrew and its meaning (the
+  page scrolls to it if needed), a short two-note chime (`Resources/success.wav`) and a
+  success haptic play, and after 1.5 seconds the next question (or the result) follows by
+  itself; there is no Next after a right answer. A wrong option turns red with ✗ and cannot be chosen
   again; "Not quite. Try again." is shown, the right answer is not revealed, the other
   options stay available, and only now is a secondary **Next** (Finish on the last question)
   offered, so the learner can move on without the answer. Finding the right answer on a
@@ -77,13 +77,20 @@ spaced review and the daily goal, so a phrase found on a later try counts as not
   as its last word is placed: a right one gets the same success feedback (its answer row turns
   green with ✓ and bounces) and moves on; a wrong one turns red with ✗, keeps its words where
   they were put (it is not corrected) and offers Next; tapping a placed word returns it to the
-  bank, and the rebuilt sentence is checked again. The "That's right" panel with the Hebrew
-  and its meaning is no longer shown. A listening question shows its Hebrew text on request
-  or with the right answer. Matching already checked every pair at once and is unchanged.
+  bank, and the rebuilt sentence is checked again. A listening question shows its Hebrew text
+  on request or with the right answer. Matching already checked every pair at once and is unchanged.
   VoiceOver announces every checked answer (queued after its own speech), reads each
-  option's mark ("That's right" or "Not correct"), and after a right answer the next question
+  option's mark ("That's right" or "Incorrect"), and after a right answer the next question
   waits until "That's right" has been spoken (at most 10 seconds more). With Reduce Motion
   there is no bounce; the pause stays.
+- **Points** (owner's rule; Android has no second try and counts right first answers). A
+  right answer earns 2 points first time and 1 point after another try; moving on with Next
+  earns none. The result shows the points out of the most possible (2 per question) and the
+  rule. The daily goal is 10 points: each phrase counts once a day with its best result, so 5
+  phrases right first time reach it, or more phrases found after another try (Android: five
+  phrases right first time). Phrases found after another try are saved by day as
+  `dailyRetried`, which Android's progress JSON does not have; it is written only once there
+  is one.
 - **More Minik apps & games** is left out: it uses an Android-only shared module, and the
   developer's App Store page URL is not known yet.
 - **Privacy note**: `ui.json` says "Android backups may include progress" in all ten
@@ -101,9 +108,11 @@ spaced review and the daily goal, so a phrase found on a later try counts as not
   layout direction after the language is chosen).
 - **Saved phrases** use an outlined heart when not saved and a filled heart when saved, so
   the state does not rely on colour alone.
-- **Audio** plays like media, also with the ring switch on silent (Android speaks on the
-  media stream), and lowers other audio only while speaking or while the success chime
-  plays; the chime mixes with the speech and with other apps' audio.
+- **Audio**: speech plays like media, also with the ring switch on silent (Android speaks on
+  the media stream), and lowers other audio only while speaking. The success chime is a
+  system sound (owner: respect silent mode): it is not played while the device is silenced
+  (ring/silent switch or Silent Mode), plays at the system sound volume and mixes with the
+  speech and other apps' audio without lowering them.
 
 ## Project layout
 
@@ -151,8 +160,9 @@ with no Check button; a right answer announced and moving on by itself once its 
 with no Next; Next only after a wrong answer (also Finish on the last question); a wrong
 option marked and retried without the answer being shown, the right answer on a retry
 moving on by itself; a wrong sentence checked when complete, fixed and moving on; leaving
-during the pause; an answer that cannot be saved not shown, announced or moved on; and only
-the first answer counting for the score, the spaced review and the daily goal. The tests end
+during the pause; an answer that cannot be saved not shown, announced or moved on; and the
+points (2 first time, 1 after another try, also toward the daily goal, saved and restored)
+with the first answer alone deciding the spaced review. The tests end
 the pause themselves (an injected `AnswerFeedback`) or run the app's `LiveAnswerFeedback` on
 an instant clock, so none of them sleeps; those also cover the wait for VoiceOver's
 announcement and its limit, and that the bundled chime is readable and ends within the pause.

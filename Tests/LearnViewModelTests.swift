@@ -124,7 +124,8 @@ final class LearnViewModelTests: XCTestCase {
             }
         }
         XCTAssertNil(vm.session)
-        XCTAssertEqual(vm.result?.score, 6)
+        XCTAssertEqual(vm.result?.score, 12, "Two points for each right answer first time")
+        XCTAssertEqual(vm.result?.maxScore, 12)
         XCTAssertTrue(vm.progress.completed.contains("understand"))
         let before = vm.progress
         XCTAssertEqual(try fixture.reopen().progress, before)
@@ -227,9 +228,11 @@ final class LearnViewModelTests: XCTestCase {
             }
             fixture.feedback.endPause()
         }
-        XCTAssertEqual(vm.result?.score, 10)
+        XCTAssertEqual(vm.result?.score, 20)
+        XCTAssertEqual(vm.result?.maxScore, 20)
         XCTAssertTrue(vm.progress.completed.isEmpty, "Daily practice completes no lesson")
         XCTAssertEqual(vm.progress.dailyCount(LocalDay.today()), 5)
+        XCTAssertEqual(vm.progress.dailyPoints(LocalDay.today()), LearnerProgress.dailyGoalPoints)
         vm.home()
         XCTAssertNil(vm.result)
         XCTAssertEqual(vm.tab, "today")
@@ -261,8 +264,9 @@ final class LearnViewModelTests: XCTestCase {
     }
 
     /// A wrong tap is marked without revealing the right answer, offers Next and can be
-    /// corrected. The right answer found on a retry plays the success feedback and moves on by
-    /// itself, but the first answer decides the score, the spaced review and the daily goal.
+    /// corrected. The right answer found on a retry plays the success feedback, moves on by
+    /// itself and earns one point, also toward the daily goal; the first answer decides the
+    /// spaced review.
     func testWrongTapIsMarkedWithoutTheAnswerAndARetryMovesOnByItself() throws {
         let fixture = try makeFixture()
         defer { fixture.remove() }
@@ -308,13 +312,15 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertEqual(s.index, 0, "The success feedback plays before moving on")
         XCTAssertTrue(fixture.feedback.waiting)
         XCTAssertEqual(fixture.feedback.announcements, [vm.t("try_again"), vm.t("try_again"), vm.t("correct")])
-        // ...but only the first answer counts: no score, no spaced progress, no daily goal.
-        XCTAssertEqual(s.score, 0)
+        // ...with one point, and one toward the daily goal; the wrong first answer still
+        // decides the spaced review, so the phrase comes back soon.
+        XCTAssertEqual(s.score, 1)
         let word = try XCTUnwrap(vm.progress.words[q.phrase.id])
         XCTAssertEqual(word.attempts, 1)
         XCTAssertEqual(word.correct, 0)
         XCTAssertEqual(word.stage, 0)
         XCTAssertEqual(vm.progress.dailyCount(LocalDay.today()), 0)
+        XCTAssertEqual(vm.progress.dailyPoints(LocalDay.today()), 1)
         // The solved question is locked, and Next is not offered.
         vm.select(wrongs[2].id)
         vm.next()
@@ -324,8 +330,8 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertEqual(moved.index, 1, "The next question follows by itself")
         XCTAssertFalse(moved.checked)
         XCTAssertTrue(moved.wrongChoices.isEmpty)
-        XCTAssertEqual(moved.score, 0)
-        XCTAssertEqual(try fixture.reopen().progress, vm.progress)
+        XCTAssertEqual(moved.score, 1)
+        XCTAssertEqual(try fixture.reopen().progress, vm.progress, "The point toward the daily goal is saved")
     }
 
     /// Next is offered only after a wrong answer: not before an answer and not after a right
@@ -350,9 +356,10 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertFalse(moved.offersNext, "The new question has no Next until it is answered wrongly")
         XCTAssertNil(moved.selection)
         XCTAssertTrue(moved.wrongChoices.isEmpty)
-        XCTAssertEqual(moved.score, 0)
+        XCTAssertEqual(moved.score, 0, "Moving on without the right answer earns nothing")
         XCTAssertFalse(fixture.feedback.waiting, "Nothing moves on by itself after a wrong answer")
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.correct, 0)
+        XCTAssertEqual(vm.progress.dailyPoints(LocalDay.today()), 0)
     }
 
     /// On the last question, Next after a wrong answer finishes the practice; the questions
@@ -385,12 +392,13 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertFalse(fixture.feedback.waiting)
         vm.next()
         XCTAssertNil(vm.session)
-        XCTAssertEqual(vm.result?.score, 5)
+        XCTAssertEqual(vm.result?.score, 10)
+        XCTAssertEqual(vm.result?.maxScore, 12)
         XCTAssertTrue(vm.progress.completed.contains("cafe"))
     }
 
     /// Sentence building is checked when the last word is placed; a wrong sentence stays as
-    /// built (it is not corrected for the learner) and can be fixed, without scoring.
+    /// built (it is not corrected for the learner) and can be fixed, for one point.
     func testWrongSentenceIsCheckedWhenCompleteAndCanBeFixed() throws {
         let fixture = try makeFixture()
         defer { fixture.remove() }
@@ -417,7 +425,7 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertFalse(fixture.feedback.waiting)
         XCTAssertEqual(fixture.feedback.announcements.last, vm.t("try_again"))
         XCTAssertEqual(s.selectedTokens, reversed, "The words stay where the learner put them")
-        XCTAssertEqual(s.score, 2)
+        XCTAssertEqual(s.score, 4, "Two right answers first time before it")
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.stage, 0)
         // Moving a word back clears the mark (Next stays); the sentence can then be built again.
@@ -433,9 +441,10 @@ final class LearnViewModelTests: XCTestCase {
         XCTAssertTrue(s.correct)
         XCTAssertFalse(s.offersNext, "No Next once the sentence is right")
         XCTAssertEqual(s.tries, 2)
-        XCTAssertEqual(s.score, 2, "A sentence fixed on a retry does not score")
+        XCTAssertEqual(s.score, 5, "A sentence fixed on a retry earns one point")
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.attempts, 1)
         XCTAssertEqual(vm.progress.words[q.phrase.id]?.correct, 0)
+        XCTAssertEqual(vm.progress.dailyPoints(LocalDay.today()), 5)
         XCTAssertEqual(fixture.feedback.announcements.last, vm.t("correct"))
         vm.token(0)
         vm.next()

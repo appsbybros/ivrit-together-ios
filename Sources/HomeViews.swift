@@ -82,15 +82,17 @@ struct DailyCard: View {
     let due: Int
 
     var body: some View {
-        let goal = LearnerProgress.dailyGoal
-        let count = vm.progress.dailyCount(LocalDay.today())
+        // The goal in points (Android counts five phrases right first time): two for a phrase
+        // answered right first time today, one for a phrase found after another try.
+        let goal = LearnerProgress.dailyGoalPoints
+        let points = vm.progress.dailyPoints(LocalDay.today())
         CardPanel(color: Palette.mint) {
             Heading(title: vm.t("daily_title"))
             BodyText(text: "\(due) · \(vm.t("review_due"))", weight: .bold, color: Palette.teal)
-            BodyText(text: vm.t(count >= goal ? "daily_goal_done" : "daily_goal"), weight: .bold)
-            BodyText(text: isolatedLTR("\(count) / \(goal)"), color: Palette.teal)
+            BodyText(text: vm.t(points >= goal ? "daily_goal_points_done" : "daily_goal_points"), weight: .bold)
+            BodyText(text: isolatedLTR("\(points) / \(goal)"), color: Palette.teal)
                 .accessibilityIdentifier("daily-count")
-            ProgressBar(value: Double(count) / Double(goal), track: Color.white)
+            ProgressBar(value: Double(points) / Double(goal), track: Color.white)
             BodyText(text: vm.t("daily_body"), color: Palette.muted)
         }
     }

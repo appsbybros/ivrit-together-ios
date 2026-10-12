@@ -3,8 +3,9 @@ import Foundation
 
 // Port of LearnViewModel.kt. Saving is synchronous on iOS (UserDefaults), so `busy` is only
 // set while a save runs; the same guards still make repeated taps harmless. Unlike Android, a
-// right answer moves on by itself after its success feedback (owner QA ISSUE-001), and Next is
-// offered only after a wrong answer.
+// right answer moves on by itself after its success feedback (owner QA ISSUE-001), Next is
+// offered only after a wrong answer, and a right answer after another try earns one point
+// (two first time; see Points).
 
 @MainActor
 final class LearnViewModel: ObservableObject {
@@ -218,20 +219,27 @@ final class LearnViewModel: ObservableObject {
     }
 
     /// Shows the session after a tap. The first checked answer of a question is saved before
-    /// it is shown, as Android's submit() does: it alone decides the spaced review and the
-    /// daily goal, so a phrase found only on a later try counts as not known yet. Later tries
-    /// change the screen only. If saving fails, the tap is not applied and the error is shown.
+    /// it is shown, as Android's submit() does: it alone decides the spaced review (a phrase
+    /// found only on a later try is not known yet and comes back soon) and, when right, gives
+    /// the phrase two points toward the daily goal. A right answer after another try is saved
+    /// as one point toward the goal. Other taps change the screen only. If saving fails, the
+    /// tap is not applied and the error is shown.
     private func show(_ updated: Session, replacing current: Session) {
         if updated == current { return }
-        guard !current.checked && updated.checked else {
-            present(updated, replacing: current)
-            return
-        }
-        let next = progress.answer(attemptId: current.attemptId,
-                                   phraseId: current.question.phrase.id,
+        let phraseId = current.question.phrase.id
+        let next: LearnerProgress
+        if !current.checked && updated.checked {
+            next = progress.answer(attemptId: current.attemptId,
+                                   phraseId: phraseId,
                                    correct: updated.correct,
                                    now: currentMillis(),
                                    date: LocalDay.today())
+        } else if current.checked && !current.correct && updated.correct {
+            next = progress.retried(phraseId: phraseId, date: LocalDay.today())
+        } else {
+            present(updated, replacing: current)
+            return
+        }
         update(next) {
             if session?.attemptId == current.attemptId {
                 present(updated, replacing: current)

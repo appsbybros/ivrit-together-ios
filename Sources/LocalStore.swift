@@ -3,7 +3,9 @@ import Foundation
 // Port of LocalStore (Data.kt). Android keeps everything in the SharedPreferences file
 // "ivrit-together": language, female, transliteration, vowels and "progress", a JSON string
 // with version 1, words, completed, saved, days, answered and dailyPhrases. iOS keeps the
-// same keys and the same JSON in the UserDefaults suite "ivrit-together".
+// same keys and the same JSON in the UserDefaults suite "ivrit-together", plus dailyRetried
+// (phrases answered right after another try, by day) once there is one: Android has no second
+// try, and older progress without it loads as before.
 
 final class LocalStore {
     static let preferenceName = "ivrit-together"
@@ -93,6 +95,8 @@ enum ProgressCodec {
         var saved: [String]?
         var days: [String]?
         var answered: [String]?
+        /// iOS only; left out while empty, so the JSON stays Android's until then.
+        var dailyRetried: [String: [String]]?
     }
 
     static func decode(_ text: String) throws -> LearnerProgress {
@@ -111,12 +115,17 @@ enum ProgressCodec {
         for (day, ids) in stored.dailyPhrases ?? [:] {
             daily[day] = Set(ids)
         }
+        var retried: [String: Set<String>] = [:]
+        for (day, ids) in stored.dailyRetried ?? [:] {
+            retried[day] = Set(ids)
+        }
         return LearnerProgress(words: words,
                                completed: Set(stored.completed ?? []),
                                saved: Set(stored.saved ?? []),
                                days: Set(stored.days ?? []),
                                answered: unique(stored.answered ?? []),
-                               dailyPhrases: daily)
+                               dailyPhrases: daily,
+                               dailyRetried: retried)
     }
 
     static func encode(_ progress: LearnerProgress) throws -> String {
@@ -129,13 +138,18 @@ enum ProgressCodec {
         for (day, ids) in progress.dailyPhrases {
             daily[day] = ids.sorted()
         }
+        var retried: [String: [String]] = [:]
+        for (day, ids) in progress.dailyRetried {
+            retried[day] = ids.sorted()
+        }
         let stored = Stored(dailyPhrases: daily,
                             version: 1,
                             words: words,
                             completed: progress.completed.sorted(),
                             saved: progress.saved.sorted(),
                             days: progress.days.sorted(),
-                            answered: progress.answered)
+                            answered: progress.answered,
+                            dailyRetried: retried.isEmpty ? nil : retried)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
         let data = try encoder.encode(stored)

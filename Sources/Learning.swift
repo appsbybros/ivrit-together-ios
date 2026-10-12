@@ -172,7 +172,11 @@ struct LearnerProgress: Equatable, Sendable {
     var saved: Set<String> = []
     var days: Set<String> = []
     var answered: [String] = []
+    /// By day, the phrases answered right first time (two points each toward the daily goal).
     var dailyPhrases: [String: Set<String>] = [:]
+    /// iOS only, by day: the phrases answered right after another try (one point each, unless
+    /// the phrase was also answered right first time that day).
+    var dailyRetried: [String: Set<String>] = [:]
 
     static let intervals: [Int64] = [
         20 * 60_000,
@@ -183,11 +187,45 @@ struct LearnerProgress: Equatable, Sendable {
         30 * 86_400_000
     ]
     static let dailyGoal = 5
+    /// The daily goal in points (iOS): five phrases answered right first time, or more phrases
+    /// found after another try.
+    static let dailyGoalPoints = dailyGoal * Points.firstTry
     static let keptDays = 60
     static let keptAttempts = 600
 
+    /// Android's daily goal: the different phrases answered right first time that day, at
+    /// most five.
     func dailyCount(_ date: LocalDay) -> Int {
         min(dailyPhrases[date.iso]?.count ?? 0, LearnerProgress.dailyGoal)
+    }
+
+    /// The day's points toward the goal (iOS): two for each phrase answered right first time
+    /// that day, one for each phrase found only after another try. A phrase counts once a day,
+    /// with its best result, and the total stops at the goal.
+    func dailyPoints(_ date: LocalDay) -> Int {
+        let firstTime = dailyPhrases[date.iso] ?? []
+        let afterRetry = (dailyRetried[date.iso] ?? []).subtracting(firstTime)
+        return min(firstTime.count * Points.firstTry + afterRetry.count * Points.afterRetry,
+                   LearnerProgress.dailyGoalPoints)
+    }
+
+    /// A phrase answered right after another try: one point toward the day's goal. Its first,
+    /// wrong answer is already saved by `answer` and still decides the spaced review, so the
+    /// phrase comes back soon.
+    func retried(phraseId: String, date: LocalDay) -> LearnerProgress {
+        var next = self
+        next.dailyRetried[date.iso, default: []].insert(phraseId)
+        next.dailyRetried = LearnerProgress.latestDays(next.dailyRetried)
+        return next
+    }
+
+    /// The latest `keptDays` days of a daily history.
+    private static func latestDays(_ history: [String: Set<String>]) -> [String: Set<String>] {
+        var kept: [String: Set<String>] = [:]
+        for key in history.keys.sorted().suffix(LearnerProgress.keptDays) {
+            kept[key] = history[key]
+        }
+        return kept
     }
 
     func answer(attemptId: String, phraseId: String, correct: Bool, now: Int64, date: LocalDay) -> LearnerProgress {
@@ -212,12 +250,8 @@ struct LearnerProgress: Equatable, Sendable {
         if correct {
             daily[date.iso, default: []].insert(phraseId)
         }
-        var kept: [String: Set<String>] = [:]
-        for key in daily.keys.sorted().suffix(LearnerProgress.keptDays) {
-            kept[key] = daily[key]
-        }
         var next = self
-        next.dailyPhrases = kept
+        next.dailyPhrases = LearnerProgress.latestDays(daily)
         next.words[phraseId] = WordProgress(
             stage: nextStage,
             due: nextDue,
@@ -269,13 +303,21 @@ struct Question: Equatable, Sendable {
     let tokenOrder: [Int]
 }
 
+/// Points for a question (iOS; the owner's rule, as Android has no second try): a right
+/// answer first time earns two, a right answer after another try one, and moving on without
+/// the right answer none. The daily goal counts phrases the same way
+/// (LearnerProgress.dailyPoints).
+enum Points {
+    static let firstTry = 2
+    static let afterRetry = 1
+}
+
 /// A practice session. iOS checks every answer as soon as it is given (owner QA ISSUE-001;
 /// Android checks with a Check button): a chosen option at once, a built sentence when its
 /// last word is placed. A right answer locks the question, and the view model moves on by
 /// itself after the success feedback. A wrong one is marked without showing the right answer,
-/// and the learner may try again or move on with Next. Only the first check of a question
-/// counts: it alone scores, and the view model saves it alone to the spaced review and the
-/// daily goal.
+/// and the learner may try again or move on with Next. A right answer scores `Points`: two
+/// first time, one after another try. The first check alone decides the spaced review.
 struct Session: Equatable, Sendable {
     var id: String = UUID().uuidString.lowercased()
     var lessonId: String? = nil
@@ -293,8 +335,11 @@ struct Session: Equatable, Sendable {
     var correct: Bool = false
     /// The last checked answer is wrong and still unchanged (moving a word clears it).
     var wrong: Bool = false
+    /// Points so far (see `Points`).
     var score: Int = 0
 
+    /// The points of a practice answered right first time throughout.
+    var maxScore: Int { questions.count * Points.firstTry }
     var question: Question { questions[index] }
     var attemptId: String { "\(id):\(index)" }
     var isLast: Bool { index == questions.count - 1 }
@@ -338,8 +383,8 @@ struct Session: Equatable, Sendable {
 
     /// Checks the current answer: the chosen option, or the sentence once all its words are
     /// placed. Nothing is checked twice: a solved question, an option already found wrong and
-    /// a wrong sentence that has not been changed are ignored. Only a right first check
-    /// scores.
+    /// a wrong sentence that has not been changed are ignored. A right answer scores two points
+    /// first time and one after another try.
     func submit() -> Session {
         if correct { return self }
         let current = question
@@ -358,8 +403,8 @@ struct Session: Equatable, Sendable {
         updated.tries = tries + 1
         updated.correct = ok
         updated.wrong = !ok
-        if ok && tries == 0 {
-            updated.score = score + 1
+        if ok {
+            updated.score = score + (tries == 0 ? Points.firstTry : Points.afterRetry)
         }
         return updated
     }

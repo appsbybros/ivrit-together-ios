@@ -1,42 +1,82 @@
 {
   "en": {
     "try_again": "Not quite. Try again.",
-    "incorrect": "Incorrect"
+    "incorrect": "Incorrect",
+    "points": "Points",
+    "points_rule": "Right the first time: 2 points. Right after another try: 1 point.",
+    "daily_goal_points": "Today: earn 10 points",
+    "daily_goal_points_done": "10 points earned. A small step forward!"
   },
   "ru": {
     "try_again": "Не совсем. Попробуйте ещё раз.",
-    "incorrect": "Неверно"
+    "incorrect": "Неверно",
+    "points": "Баллы",
+    "points_rule": "Верно с первой попытки — 2 балла. Верно после повторной попытки — 1 балл.",
+    "daily_goal_points": "Сегодня: наберите 10 баллов",
+    "daily_goal_points_done": "Набрано 10 баллов. Ещё один шаг вперёд!"
   },
   "uk": {
     "try_again": "Не зовсім. Спробуйте ще раз.",
-    "incorrect": "Неправильно"
+    "incorrect": "Неправильно",
+    "points": "Бали",
+    "points_rule": "Правильно з першої спроби — 2 бали. Правильно після повторної спроби — 1 бал.",
+    "daily_goal_points": "Сьогодні: наберіть 10 балів",
+    "daily_goal_points_done": "Набрано 10 балів. Ще один крок уперед!"
   },
   "fr": {
     "try_again": "Pas tout à fait. Réessayez.",
-    "incorrect": "Incorrect"
+    "incorrect": "Incorrect",
+    "points": "Points",
+    "points_rule": "Bonne réponse du premier coup : 2 points. Bonne réponse après un nouvel essai : 1 point.",
+    "daily_goal_points": "Aujourd’hui : gagnez 10 points",
+    "daily_goal_points_done": "10 points gagnés. Un pas de plus !"
   },
   "es": {
     "try_again": "No exactamente. Inténtalo de nuevo.",
-    "incorrect": "Incorrecto"
+    "incorrect": "Incorrecto",
+    "points": "Puntos",
+    "points_rule": "Acierto a la primera: 2 puntos. Acierto tras otro intento: 1 punto.",
+    "daily_goal_points": "Hoy: consigue 10 puntos",
+    "daily_goal_points_done": "10 puntos conseguidos. ¡Un paso más!"
   },
   "pt": {
     "try_again": "Não é bem isso. Tente de novo.",
-    "incorrect": "Incorreto"
+    "incorrect": "Incorreto",
+    "points": "Pontos",
+    "points_rule": "Acerto na primeira tentativa: 2 pontos. Acerto após outra tentativa: 1 ponto.",
+    "daily_goal_points": "Hoje: ganhe 10 pontos",
+    "daily_goal_points_done": "10 pontos conquistados. Mais um passo!"
   },
   "ar": {
     "try_again": "ليس تمامًا. حاول مجددًا.",
-    "incorrect": "غير صحيح"
+    "incorrect": "غير صحيح",
+    "points": "النقاط",
+    "points_rule": "إجابة صحيحة من المحاولة الأولى: نقطتان. إجابة صحيحة بعد محاولة أخرى: نقطة واحدة.",
+    "daily_goal_points": "اليوم: اجمع 10 نقاط",
+    "daily_goal_points_done": "جمعت 10 نقاط. خطوة إلى الأمام!"
   },
   "am": {
     "try_again": "ትክክል አይደለም። እንደገና ይሞክሩ።",
-    "incorrect": "ትክክል አይደለም"
+    "incorrect": "ትክክል አይደለም",
+    "points": "ነጥቦች",
+    "points_rule": "በመጀመሪያው ሙከራ ትክክል ከሆነ፦ 2 ነጥብ። ከሌላ ሙከራ በኋላ ትክክል ከሆነ፦ 1 ነጥብ።",
+    "daily_goal_points": "ዛሬ፦ 10 ነጥብ ያግኙ",
+    "daily_goal_points_done": "10 ነጥብ አግኝተዋል። አንድ እርምጃ ወደፊት!"
   },
   "de": {
     "try_again": "Nicht ganz. Versuche es erneut.",
-    "incorrect": "Falsch"
+    "incorrect": "Falsch",
+    "points": "Punkte",
+    "points_rule": "Beim ersten Versuch richtig: 2 Punkte. Nach einem weiteren Versuch richtig: 1 Punkt.",
+    "daily_goal_points": "Heute: 10 Punkte sammeln",
+    "daily_goal_points_done": "10 Punkte gesammelt. Ein Schritt nach vorn!"
   },
   "he": {
     "try_again": "לא בדיוק. נסו שוב.",
-    "incorrect": "לא נכון"
+    "incorrect": "לא נכון",
+    "points": "נקודות",
+    "points_rule": "תשובה נכונה בניסיון הראשון: 2 נקודות. תשובה נכונה אחרי ניסיון נוסף: נקודה אחת.",
+    "daily_goal_points": "היום: צוברים 10 נקודות",
+    "daily_goal_points_done": "צברתם 10 נקודות. עוד צעד קדימה!"
   }
 }

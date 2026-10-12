@@ -3,10 +3,11 @@ import UIKit
 
 // Port of Practice, Token, ResultPage and MatchPage (MainActivity.kt). Unlike Android, an
 // answer is checked as soon as it is tapped, with no Check button (owner QA ISSUE-001). A right
-// answer turns green with a check mark, bounces, plays a chime and a success haptic, and the
-// next question follows by itself after about 1.2 seconds (LiveAnswerFeedback). A wrong answer
-// is marked red with a cross, without showing the right one, and can be corrected; only then is
-// Next offered, so the learner can also move on without the answer.
+// answer turns green with a check mark, bounces, shows Android's "That's right" panel with the
+// phrase's Hebrew and meaning, plays a chime and a success haptic, and the next question
+// follows by itself after 1.5 seconds (LiveAnswerFeedback). A wrong answer is marked red with
+// a cross, without showing the right one, and can be corrected; only then is Next offered, so
+// the learner can also move on without the answer. The result counts points (see Points).
 
 struct PracticeView: View {
     @EnvironmentObject private var vm: LearnViewModel
@@ -21,7 +22,9 @@ struct PracticeView: View {
     var body: some View {
         if let session = vm.session {
             let question = session.question
-            Page { _ in
+            // A right answer's panel is scrolled into view, so it is seen before the next
+            // question follows; every question starts at the top of the page.
+            Page(focus: session.correct ? PracticeView.rightAnswerId : nil, start: session.attemptId) { _ in
                 HStack(alignment: .firstTextBaseline) {
                     BodyText(text: vm.t("practice"), color: Palette.muted)
                     Spacer(minLength: 12)
@@ -49,7 +52,9 @@ struct PracticeView: View {
                         .scaleEffect(mark == .right ? bounce : 1)
                     }
                 }
-                if session.wrong {
+                if session.correct {
+                    rightAnswer(question: question)
+                } else if session.wrong {
                     tryAgain()
                 }
                 // Next only after a wrong answer, to move on without being shown the answer, in
@@ -82,6 +87,9 @@ struct PracticeView: View {
             .onDisappear { speech.stop() }
         }
     }
+
+    /// The id of a right answer's panel, which the page scrolls to.
+    static let rightAnswerId = "right-answer"
 
     static func headingKey(_ kind: Exercise) -> String {
         switch kind {
@@ -246,8 +254,19 @@ struct PracticeView: View {
         return plain.indices.contains(index) ? String(plain[index]) : question.tokens[index]
     }
 
-    /// After a wrong answer, the invitation to try again: the right answer is not revealed. A
-    /// right answer has no panel; its success feedback is on the answer itself.
+    /// After a right answer, as on Android: "That's right" with the phrase's Hebrew and meaning,
+    /// on screen during the success feedback.
+    private func rightAnswer(question: Question) -> some View {
+        CardPanel(color: Palette.mint) {
+            BodyText(text: "✓ " + vm.t("correct"), size: 23, weight: .bold)
+                .accessibilityIdentifier("feedback")
+            HebrewText(text: vm.hebrew(question.phrase), size: 29)
+            BodyText(text: question.phrase.meaning(vm.language))
+        }
+        .id(PracticeView.rightAnswerId)
+    }
+
+    /// After a wrong answer, the invitation to try again: the right answer is not revealed.
     private func tryAgain() -> some View {
         CardPanel(color: Palette.retry) {
             BodyText(text: "↺ " + vm.t("try_again"), size: 23, weight: .bold)
@@ -375,9 +394,12 @@ struct ResultView: View {
                         .foregroundStyle(Palette.gold)
                         .accessibilityHidden(true)
                     BodyText(text: vm.t("well_done"), size: 31, weight: .bold, color: Color.white)
-                    BodyText(text: isolatedLTR("\(result.score) / \(result.questions.count)"),
+                    // Points instead of Android's count of right answers: two for a right
+                    // answer first time, one after another try.
+                    BodyText(text: isolatedLTR("\(result.score) / \(result.maxScore)"),
                              size: 48, weight: .bold, color: Palette.gold)
-                    BodyText(text: vm.t("score"), color: Color.white)
+                    BodyText(text: vm.t("points"), color: Color.white)
+                    BodyText(text: vm.t("points_rule"), size: 16, color: Color.white.opacity(0.85))
                 }
                 BodyText(text: vm.t("result_tip"), color: Palette.muted)
                 ActionButton(title: vm.t("home"), identifier: "result-home") {

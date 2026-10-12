@@ -11,7 +11,7 @@ only; it is not a Swift build (the verify workflow compiles and tests on a Mac).
 - AppIcon 1024 x 1024 PNG without transparency; asset catalog and privacy manifest parse;
   one InfoPlist.strings per language listed in project.yml.
 - success.wav (the chime after a right answer, Scripts/make_sound.py): 16-bit PCM, mono,
-  44.1 kHz, shorter than the 1.2-second success pause, bundled by project.yml.
+  44.1 kHz, shorter than the 1.5-second success pause, bundled by project.yml.
 - App Store texts within Apple's limits (name and subtitle 30, keywords 100, description 4000,
   promotional text 170, what's new 4000).
 """
@@ -129,7 +129,7 @@ try:
         check((sound.getnchannels(), sound.getsampwidth(), sound.getframerate()) == (1, 2, 44100),
               "success.wav must be 16-bit PCM, mono, 44.1 kHz")
         chime_seconds = round(sound.getnframes() / sound.getframerate(), 2)
-    check(0.2 < chime_seconds < 1.2, f"success.wav lasts {chime_seconds} s; it must end within the 1.2-second success pause")
+    check(0.2 < chime_seconds < 1.5, f"success.wav lasts {chime_seconds} s; it must end within the 1.5-second success pause")
 except (OSError, EOFError, wave.Error) as error:
     problems.append(f"Resources/success.wav cannot be read ({error}); run Scripts/make_sound.py")
 

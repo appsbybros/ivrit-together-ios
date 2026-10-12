@@ -1,3 +1,4 @@
+import AudioToolbox
 import AVFoundation
 import Combine
 import UIKit
@@ -6,34 +7,38 @@ import UIKit
 // speaks at 0.88 (normal) or 0.65 (slow) of the engine's normal rate. iOS voices are on the
 // device; the same factors apply to AVSpeechUtteranceDefaultSpeechRate. Without a Hebrew
 // voice, `failed` shows the voice notice and Voice settings opens this app's Settings page.
-// The success chime after a right answer (iOS only, owner QA ISSUE-001) plays here too, so the
-// speech and the chime share one audio session.
+// The success chime after a right answer (iOS only, owner QA ISSUE-001) is played here too, as
+// a system sound: unlike the speech, it respects silent mode.
 
 @MainActor
-final class Speech: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAudioPlayerDelegate {
+final class Speech: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     @Published private(set) var ready = false
     @Published private(set) var failed = false
 
     private let synthesizer = AVSpeechSynthesizer()
     private var voice: AVSpeechSynthesisVoice?
-    /// Resources/success.wav (Scripts/make_sound.py); nil if it cannot be read.
-    private var chime: AVAudioPlayer?
+    /// Resources/success.wav (Scripts/make_sound.py) as a system sound; nil if it cannot be
+    /// read. Speech lives as long as the app, so the sound is never disposed.
+    private let chime: SystemSoundID?
 
     static let normalRate: Float = 0.88
     static let slowRate: Float = 0.65
 
     override init() {
+        chime = Speech.loadChime()
         super.init()
         synthesizer.delegate = self
         // Lessons play like media (also with the ring switch on silent), as Android's
-        // text-to-speech does, and lower other audio only while speaking (or while the success
-        // chime plays).
+        // text-to-speech does, and lower other audio only while speaking.
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
-        if let url = Bundle.main.url(forResource: "success", withExtension: "wav") {
-            chime = try? AVAudioPlayer(contentsOf: url)
-            chime?.delegate = self
-        }
         refresh()
+    }
+
+    private static func loadChime() -> SystemSoundID? {
+        guard let url = Bundle.main.url(forResource: "success", withExtension: "wav") else { return nil }
+        var sound: SystemSoundID = 0
+        guard AudioServicesCreateSystemSoundID(url as CFURL, &sound) == kAudioServicesNoError else { return nil }
+        return sound
     }
 
     /// Called at launch and whenever the app becomes active again, so a voice installed in
@@ -69,14 +74,13 @@ final class Speech: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVA
         }
     }
 
-    /// The short success chime after a right answer. It plays through the same session as the
-    /// speech, so it mixes with the speech and with other apps' audio, which is lowered only
-    /// while it plays.
+    /// The short success chime after a right answer (owner: respect silent mode). As a system
+    /// sound it is not played while the device is silenced (the ring/silent switch, or Silent
+    /// Mode in Control Center), and it mixes with the speech and with other apps' audio without
+    /// lowering them; it does not use the app's audio session.
     func playSuccess() {
         guard let chime = chime else { return }
-        try? AVAudioSession.sharedInstance().setActive(true)
-        chime.currentTime = 0
-        chime.play()
+        AudioServicesPlaySystemSound(chime)
     }
 
     /// iOS has no public link to the speech voice settings; this opens the app's own page in
@@ -93,10 +97,10 @@ final class Speech: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVA
         }
     }
 
-    /// Ends the audio session once neither the speech nor the chime is playing, so other apps'
-    /// audio returns to full volume.
+    /// Ends the audio session once the speech has stopped, so other apps' audio returns to
+    /// full volume.
     private func audioEnded() {
-        guard !synthesizer.isSpeaking, chime?.isPlaying != true else { return }
+        guard !synthesizer.isSpeaking else { return }
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
@@ -105,10 +109,6 @@ final class Speech: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVA
     }
 
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        Task { @MainActor [weak self] in self?.audioEnded() }
-    }
-
-    nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         Task { @MainActor [weak self] in self?.audioEnded() }
     }
 }

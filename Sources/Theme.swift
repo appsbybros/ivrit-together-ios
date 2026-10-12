@@ -64,28 +64,61 @@ extension View {
     }
 }
 
-/// Android's Page: a scrolling column, at most 1100 points wide, 20 points of padding.
+/// The id of a page's whole content, for scrolling back to its top.
+private let pageContentId = "page-content"
+
+/// Android's Page: a scrolling column, at most 1100 points wide, 20 points of padding. When
+/// `focus` changes to the id of a view on the page, the page scrolls just enough to show that
+/// view whole (not at all if it is already on screen); when `start` changes, the page goes
+/// back to its top.
 struct Page<Content: View>: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let maxWidth: CGFloat
+    private let focus: String?
+    private let start: String?
     private let content: (CGFloat) -> Content
 
-    init(maxWidth: CGFloat = 1100, @ViewBuilder content: @escaping (CGFloat) -> Content) {
+    init(maxWidth: CGFloat = 1100, focus: String? = nil, start: String? = nil,
+         @ViewBuilder content: @escaping (CGFloat) -> Content) {
         self.maxWidth = maxWidth
+        self.focus = focus
+        self.start = start
         self.content = content
     }
 
     var body: some View {
         GeometryReader { proxy in
             let width = max(0, min(proxy.size.width, maxWidth) - 40)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    content(width)
+            ScrollViewReader { reader in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        content(width)
+                    }
+                    .padding(20)
+                    .frame(maxWidth: maxWidth, alignment: .leading)
+                    .frame(maxWidth: .infinity)
+                    .id(pageContentId)
                 }
-                .padding(20)
-                .frame(maxWidth: maxWidth, alignment: .leading)
-                .frame(maxWidth: .infinity)
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: focus) { _, target in
+                    guard let target = target else { return }
+                    scroll(reader, to: target, anchor: nil, animated: true)
+                }
+                .onChange(of: start) { _, _ in
+                    scroll(reader, to: pageContentId, anchor: .top, animated: false)
+                }
             }
-            .scrollDismissesKeyboard(.interactively)
+        }
+    }
+
+    /// Scrolls after this update, once new views have been laid out; never animated with
+    /// Reduce Motion.
+    private func scroll(_ reader: ScrollViewProxy, to id: String, anchor: UnitPoint?, animated: Bool) {
+        let animation: Animation? = animated && !reduceMotion ? .easeOut(duration: 0.25) : nil
+        Task { @MainActor in
+            withAnimation(animation) {
+                reader.scrollTo(id, anchor: anchor)
+            }
         }
     }
 }
